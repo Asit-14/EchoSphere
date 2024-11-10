@@ -1,0 +1,16 @@
+{
+  "name": "online-chat-webpage",
+  "version": "1.0.0",
+  "description": "MERN application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node backend/server.js"
+  },
+  "author": "Asit kumar",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
+    "nodemon": "^3.1.7"
+  }
+}
