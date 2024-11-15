@@ -1,17 +1,15 @@
 {
-  "name": "online-chat-webpage",
+  "name": "chat-app",
   "version": "1.0.0",
-  "description": "MERN application",
+  "description": "\"Mern Project\"",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon backend/server.js"
+    "start": "node backend/server.js"
   },
   "author": "Asit kumar",
   "license": "ISC",
   "dependencies": {
-    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.21.1",
-    "nodemon": "^3.1.7"
+    "express": "^4.21.1"
   }
 }

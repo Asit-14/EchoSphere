@@ -1,90 +1,107 @@
 const chats = [
     {
-        isGroupChat: false,
+        isGroupChat:false,
         users: [
             {
-                name: "Asit Kumar",
-                email: "asitshakya789@gmail.com"
+                "id": 1,
+                "name": "Asit Kumar",
+                "email": "asitkumar@gmail.com"
             },
             {
-                name: "Amit Kumar",
-                email: "amitshakya687@gmail.com"
+                "id": 2,
+                "name": "Amit Kumar",
+                "email": "amitkumar@gmail.com"
             },
+
         ],
-        _id: "8e7fyeuhe8fefhg8",
-        chatName: "Asit Kumar",
+        _id: "3434rgfg4",
+        chatname: "Asit kumar",
     },
     {
         isGroupChat: false,
         users: [
             {
-                name: "John Doe",
-                email: "john.doe@example.com"
+                id: 1,
+                name: "Dheeraj",
+                email: "dheeraj@gmail.com",
             },
             {
-                name: "Jane Smith",
-                email: "jane.smith@example.com"
+                id: 2,
+                name: "Aakash",
+                email: "aakash@gmail.com",
             },
         ],
-        _id: "9f8g7h6g5f4e3d2c",
-        chatName: "John Doe",
-    },
-    {
-        isGroupChat: true,
-        users: [
-            {
-                name: "Alice Johnson",
-                email: "alice.johnson@example.com"
-            },
-            {
-                name: "Bob Brown",
-                email: "bob.brown@example.com"
-            },
-            {
-                name: "Charlie Davis",
-                email: "charlie.davis@example.com"
-            },
-        ],
-        _id: "1a2b3c4d5e6f7g8h",
-        chatName: "Friends Group",
-    },
-    {
-        isGroupChat: true,
-        users: [
-            {
-                name: "Eve White",
-                email: "eve.white@example.com"
-            },
-            {
-                name: "Frank Black",
-                email: "frank.black@example.com"
-            },
-            {
-                name: "Grace Green",
-                email: "grace.green@example.com"
-            },
-            {
-                name: "Hank Red",
-                email: "hank.red@example.com"
-            },
-        ],
-        _id: "2h3g4f5e6d7c8b9a",
-        chatName: "Work Team",
+        _id: "454fgdfg3fgf545",
+        chatname: "Dheeraj",
     },
     {
         isGroupChat: false,
         users: [
             {
-                name: "Liam Neeson",
-                email: "liam.neeson@example.com"
+                id: 3,
+                name: "Sonu",
+                email: "sonu@gmail.com",
             },
             {
-                name: "Emma Watson",
-                email: "emma.watson@example.com"
+                id: 4,
+                name: "Nukhil",
+                email: "nukhil@gmail.com",
             },
         ],
-        _id: "3c2b1a0e9d8c7f6g",
-        chatName: "Liam Neeson",
+        _id: "35434dsdfg",
+        chatname: "Sonu",
+    },
+    {
+        isGroupChat: false,
+        users: [
+            {
+                id: 5,
+                name: "Saif",
+                email: "saif@gmail.com",
+            },
+            {
+                id: 6,
+                name: "Prashant",
+                email: "prashant@gmail.com",
+            },
+        ],
+        _id: "4rgfg5545",
+        chatname: "Saif",
+    },
+    {
+        isGroupChat: false,
+        users: [
+            {
+                id: 7,
+                name: "Aashik",
+                email: "aashik@gmail.com",
+            },
+            {
+                id: 8,
+                name: "Preeti",
+                email: "preeti@gmail.com",
+            },
+        ],
+        _id: "32344fgf",
+        chatname: "Aashik",
+    },
+    {
+        isGroupChat: false,
+        users: [
+            {
+                id: 9,
+                name: "Priya",
+                email: "priya@gmail.com",
+            },
+            {
+                id: 10,
+                name: "Dheeraj",
+                email: "dheeraj@gmail.com",
+            },
+        ],
+        _id: "4gfgf5655",
+        chatname: "Priya",
     },
 ];
-module.exports= {chats};
+
+module.exports={chats};
