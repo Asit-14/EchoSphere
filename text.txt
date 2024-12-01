@@ -1,0 +1,8 @@
+For Frontend.
+
+cd public
+yarn start
+
+
+cd server
+yarn start
