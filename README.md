@@ -1,4 +1,4 @@
-## Chatup!  MERN Project 
+## Chatup!  Real time Chat Applications 
 
 
 ## Installation Guide
