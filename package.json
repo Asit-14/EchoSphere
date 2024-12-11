@@ -26,6 +26,7 @@
     "require-directory": "^2.1.1",
     "rxjs": "^7.8.1",
     "shell-quote": "^1.8.2",
+    "socket.io": "^4.8.1",
     "string-width": "^4.2.3",
     "strip-ansi": "^6.0.1",
     "supports-color": "^8.1.1",
