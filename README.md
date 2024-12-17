@@ -29,8 +29,25 @@ Before you begin, ensure you have the following software installed on your syste
 
 Make sure MongoDB is running before proceeding with the installation.
 
+<<<<<<< HEAD
 ### Installation Steps
 1. **Clone the Repository**
    ```bash
    git clone https://github.com/asitshakya789/ChatUp
    cd chatup
+=======
+
+For Frontend.
+```shell
+cd public
+yarn start
+```
+For Backend.
+
+Open another terminal in folder, Also make sure mongodb is running in background.
+```shell
+cd server
+yarn start
+```
+Done! Now open localhost:3000 in your browser.
+>>>>>>> f4be6e0d775a7155f7512a725b54bdef9b7292ae
