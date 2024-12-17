@@ -1,34 +1,36 @@
-## Chatup!  Real time Chat Applications 
+# Chatup! Real-Time Chat Application
 
+Welcome to **Chatup**, a powerful and intuitive real-time chat application that allows users to connect, communicate, and collaborate seamlessly. This README will guide you through the installation process, provide an overview of the application, and help you get started quickly.
+
+## Table of Contents
+- [Features](#features)
+- [Installation Guide](#installation-guide)
+  - [Requirements](#requirements)
+  - [Installation Steps](#installation-steps)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
+
+## Features
+- **Real-Time Messaging**: Instant communication with WebSocket support.
+- **User  Authentication**: Secure login and registration system.
+- **Group Chats**: Create and manage group conversations.
+- **Message History**: Access previous messages and chat logs.
+- **Responsive Design**: Works seamlessly on both desktop and mobile devices.
 
 ## Installation Guide
 
 ### Requirements
-- [Nodejs](https://nodejs.org/en/download)
-- [Mongodb](https://www.mongodb.com/docs/manual/administration/install-community/)
+Before you begin, ensure you have the following software installed on your system:
 
-Both should be installed and make sure mongodb is running.
+- **Node.js**: A JavaScript runtime built on Chrome's V8 engine, essential for running the server-side code. [Download Node.js](https://nodejs.org/)
+- **MongoDB**: A NoSQL database for storing user data, messages, and group information. [Download MongoDB](https://www.mongodb.com/try/download/community)
 
-Now install the dependencies
-```shell
-cd server
-yarn
-cd ..
-cd public
-yarn
-```
-We are almost done, Now just start the development server.
+Make sure MongoDB is running before proceeding with the installation.
 
-For Frontend.
-```shell
-cd public
-yarn start
-```
-For Backend.
-
-Open another terminal in folder, Also make sure mongodb is running in background.
-```shell
-cd server
-yarn start
-```
-Done! Now open localhost:3000 in your browser.
+### Installation Steps
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/asitshakya789/ChatUp
+   cd chatup
