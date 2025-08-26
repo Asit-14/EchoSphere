@@ -34,7 +34,7 @@ const server = app.listen(process.env.PORT, () =>
 );
 const io = socket(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: process.env.NODE_ENV === "production" ? "*" : "http://localhost:3000",
     credentials: true,
   },
 });
@@ -49,7 +49,37 @@ io.on("connection", (socket) => {
   socket.on("send-msg", (data) => {
     const sendUserSocket = onlineUsers.get(data.to);
     if (sendUserSocket) {
-      socket.to(sendUserSocket).emit("msg-recieve", data.msg);
+      socket.to(sendUserSocket).emit("msg-receive", data.msg);
+    }
+  });
+  
+  // Handle message deletion notification
+  socket.on("delete-msg", (data) => {
+    const sendUserSocket = onlineUsers.get(data.to);
+    if (sendUserSocket) {
+      socket.to(sendUserSocket).emit("msg-deleted", data.messageId);
+    }
+  });
+  
+  // Handle clear chat notification
+  socket.on("clear-chat", (data) => {
+    const sendUserSocket = onlineUsers.get(data.to);
+    if (sendUserSocket) {
+      socket.to(sendUserSocket).emit("chat-cleared", data.from);
+    }
+  });
+  
+  socket.on("typing", (data) => {
+    const sendUserSocket = onlineUsers.get(data.to);
+    if (sendUserSocket) {
+      socket.to(sendUserSocket).emit("typing");
+    }
+  });
+  
+  socket.on("stop-typing", (data) => {
+    const sendUserSocket = onlineUsers.get(data.to);
+    if (sendUserSocket) {
+      socket.to(sendUserSocket).emit("stop-typing");
     }
   });
 });

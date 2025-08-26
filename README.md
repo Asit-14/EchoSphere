@@ -99,9 +99,23 @@ Proudly completed and certified for real-time chat development!
 6. **Open [http://localhost:3000](http://localhost:3000) in your browser.**
 
 **_For Docker deployment:_**
+   
+1. **Update MongoDB Connection:**
+   - Make sure the MongoDB Atlas URL is correctly set in both the server/.env file and docker-compose.yml
+   - The MongoDB URL is: `mongodb+srv://asitshakya789:Fsi%401234@echosphere-db.2mzknvv.mongodb.net/?retryWrites=true&w=majority&appName=echosphere-db`
+
+2. **Update API URL for Production:**
+   - When deploying to a server, update the REACT_APP_API_URL in docker-compose.yml to the actual server address
+   - For example: `REACT_APP_API_URL=https://your-server-domain.com`
+
+3. **Build and run with Docker:**
    ```bash
    docker-compose up --build
    ```
+
+4. **Access the application:**
+   - Frontend: `http://your-server-ip:3000`
+   - Backend API: `http://your-server-ip:5000`
 
 ---
 

@@ -27,13 +27,23 @@ const Button = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  background-color: #9a86f3;
+  padding: 0.4rem;
+  border-radius: 50%;
+  background-color: var(--primary-color);
   border: none;
   cursor: pointer;
+  width: 32px;
+  height: 32px;
+  transition: var(--transition-fast);
+  margin-right: 0.5rem;
+  
+  &:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+  }
+  
   svg {
-    font-size: 1.3rem;
-    color: #ebe7ff;
+    font-size: 1.1rem;
+    color: var(--text-primary);
   }
 `;

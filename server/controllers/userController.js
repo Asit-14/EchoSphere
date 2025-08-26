@@ -83,3 +83,107 @@ module.exports.logOut = (req, res, next) => {
     next(ex);
   }
 };
+
+module.exports.updateUser = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    const { username, email, age } = req.body;
+    
+    // Check if username or email already exists for another user
+    if (username) {
+      const usernameCheck = await User.findOne({ 
+        username, 
+        _id: { $ne: userId } 
+      });
+      
+      if (usernameCheck) {
+        return res.json({ 
+          msg: "Username already in use by another account", 
+          status: false 
+        });
+      }
+    }
+    
+    if (email) {
+      const emailCheck = await User.findOne({ 
+        email, 
+        _id: { $ne: userId } 
+      });
+      
+      if (emailCheck) {
+        return res.json({ 
+          msg: "Email already in use by another account", 
+          status: false 
+        });
+      }
+    }
+    
+    // Update the user data
+    const updateData = {};
+    if (username) updateData.username = username;
+    if (email) updateData.email = email;
+    if (age !== undefined) updateData.age = age;
+    
+    const user = await User.findByIdAndUpdate(
+      userId,
+      updateData,
+      { new: true }
+    ).select([
+      "email",
+      "username",
+      "avatarImage",
+      "isAvatarImageSet",
+      "age",
+      "_id",
+    ]);
+    
+    if (!user) {
+      return res.json({ msg: "User not found", status: false });
+    }
+    
+    return res.json({ 
+      status: true, 
+      user,
+      msg: "Profile updated successfully" 
+    });
+  } catch (ex) {
+    console.error("Update user error:", ex);
+    next(ex);
+  }
+};
+
+module.exports.changePassword = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    const { currentPassword, newPassword } = req.body;
+    
+    // Find the user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.json({ msg: "User not found", status: false });
+    }
+    
+    // Verify current password
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isPasswordValid) {
+      return res.json({ msg: "Current password is incorrect", status: false });
+    }
+    
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    
+    // Update the password
+    await User.findByIdAndUpdate(
+      userId,
+      { password: hashedPassword }
+    );
+    
+    return res.json({ 
+      status: true, 
+      msg: "Password changed successfully" 
+    });
+  } catch (ex) {
+    console.error("Change password error:", ex);
+    next(ex);
+  }
+};

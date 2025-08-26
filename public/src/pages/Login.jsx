@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styled from "styled-components";
 import { useNavigate, Link } from "react-router-dom";
-import Logo from "../assets/logo.svg";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { loginRoute } from "../utils/APIRoutes";
+// Import Font Awesome CSS
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ export default function Login() {
     if (localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)) {
       navigate("/");
     }
-  }, []);
+  }, [navigate]);
 
   const handleChange = (event) => {
     setValues({ ...values, [event.target.name]: event.target.value });
@@ -66,25 +67,66 @@ export default function Login() {
       <FormContainer>
         <form action="" onSubmit={(event) => handleSubmit(event)}>
           <div className="brand">
-            <img src={Logo} alt="logo" />
-            <h1>Chatup!</h1>
+            <h1>EchoSphere</h1>
           </div>
-          <input
-            type="text"
-            placeholder="Username"
-            name="username"
-            onChange={(e) => handleChange(e)}
-            min="3"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            name="password"
-            onChange={(e) => handleChange(e)}
-          />
+          
+          <div className="form-group">
+            <label htmlFor="username">
+              <i className="fas fa-user"></i>
+            </label>
+            <input
+              type="text"
+              id="username"
+              placeholder="Username"
+              name="username"
+              onChange={(e) => handleChange(e)}
+              min="3"
+              required
+            />
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="password">
+              <i className="fas fa-lock"></i>
+            </label>
+            <input
+              type="password"
+              id="password"
+              placeholder="Password"
+              name="password"
+              onChange={(e) => handleChange(e)}
+              required
+            />
+          </div>
+          
+          <div className="form-options">
+            <div className="remember-me">
+              <input type="checkbox" id="remember" />
+              <label htmlFor="remember">Remember me</label>
+            </div>
+            <Link to="/forgot-password" className="forgot-password">Forgot Password?</Link>
+          </div>
+          
           <button type="submit">Log In</button>
-          <span>
-            Don't have an account ? <Link to="/register">Create One.</Link>
+          
+          <div className="divider">
+            <span>OR</span>
+          </div>
+          
+          <div className="social-login">
+            <button type="button" className="social-btn google">
+              <i className="fab fa-google"></i>
+            </button>
+            <button type="button" className="social-btn facebook">
+              <i className="fab fa-facebook-f"></i>
+            </button>
+            <button type="button" className="social-btn github">
+              <i className="fab fa-github"></i>
+            </button>
+          </div>
+          
+          <span className="signup-link">
+            Don't have an account? <Link to="/register">Create One</Link>
           </span>
         </form>
       </FormContainer>
@@ -99,65 +141,277 @@ const FormContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 1rem;
   align-items: center;
-  background-color: #131324;
+  background: linear-gradient(135deg, var(--background-dark) 0%, var(--background-medium) 100%);
+  position: relative;
+  overflow: hidden;
+  
+  /* Animated background effect */
+  &::before {
+    content: "";
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    z-index: -1;
+    background: radial-gradient(circle, var(--primary-color) 0%, transparent 8%), 
+                radial-gradient(circle, var(--secondary-color) 0%, transparent 6%);
+    background-size: 30px 30px;
+    opacity: 0.1;
+    animation: moveBackground 120s linear infinite;
+  }
+  
+  @keyframes moveBackground {
+    0% { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(-100px) rotate(10deg); }
+  }
+  
   .brand {
     display: flex;
     align-items: center;
-    gap: 1rem;
     justify-content: center;
-    img {
-      height: 5rem;
-    }
+    margin-bottom: 2.5rem;
+    
     h1 {
-      color: white;
+      color: var(--text-primary);
       text-transform: uppercase;
+      font-weight: 700;
+      font-size: 3rem;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      position: relative;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
     }
   }
 
   form {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-    background-color: #00000076;
-    border-radius: 2rem;
-    padding: 5rem;
-  }
-  input {
-    background-color: transparent;
-    padding: 1rem;
-    border: 0.1rem solid #4e0eff;
-    border-radius: 0.4rem;
-    color: white;
+    gap: 1.5rem;
+    background-color: rgba(30, 30, 46, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 3rem;
     width: 100%;
-    font-size: 1rem;
-    &:focus {
-      border: 0.1rem solid #997af0;
-      outline: none;
+    max-width: 400px;
+    box-shadow: var(--box-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: transform 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-5px);
+    }
+    
+    @media (max-width: 480px) {
+      width: 90%;
+      padding: 2rem;
     }
   }
-  button {
-    background-color: #4e0eff;
+  
+  .form-group {
+    position: relative;
+    margin-bottom: 0.5rem;
+    
+    label {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-tertiary);
+      font-size: 1rem;
+    }
+    
+    input {
+      background-color: rgba(0, 0, 0, 0.2);
+      padding: 1rem 1rem 1rem 2.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: var(--text-primary);
+      width: 100%;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+      
+      &:focus {
+        border: 1px solid var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(154, 134, 243, 0.2);
+        outline: none;
+      }
+    }
+  }
+  
+  .form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    margin: -0.5rem 0 0.5rem;
+    
+    .remember-me {
+      display: flex;
+      align-items: center;
+      
+      input[type="checkbox"] {
+        margin-right: 6px;
+        accent-color: var(--primary-color);
+      }
+      
+      label {
+        color: var(--text-tertiary);
+        cursor: pointer;
+      }
+    }
+    
+    .forgot-password {
+      color: var(--primary-color);
+      text-decoration: none;
+      transition: color 0.2s;
+      
+      &:hover {
+        color: var(--secondary-color);
+        text-decoration: underline;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  }
+  
+  .divider {
+    display: flex;
+    align-items: center;
+    margin: 1rem 0;
+    
+    &:before, &:after {
+      content: "";
+      flex-grow: 1;
+      height: 1px;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    span {
+      padding: 0 1rem;
+      color: var(--text-tertiary);
+      font-size: 0.85rem;
+      margin: 0;
+    }
+  }
+  
+  .social-login {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    
+    .social-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      transition: all 0.3s;
+      
+      &:hover {
+        transform: translateY(-3px);
+      }
+      
+      &.google {
+        background-color: #DB4437;
+      }
+      
+      &.facebook {
+        background-color: #4267B2;
+      }
+      
+      &.github {
+        background-color: #333;
+      }
+    }
+  }
+  
+  button[type="submit"] {
+    background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     padding: 1rem 2rem;
     border: none;
     font-weight: bold;
     cursor: pointer;
-    border-radius: 0.4rem;
+    border-radius: 8px;
     font-size: 1rem;
     text-transform: uppercase;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+    letter-spacing: 1px;
+    
     &:hover {
-      background-color: #4e0eff;
+      transform: translateY(-2px);
+      box-shadow: 0 7px 14px rgba(78, 14, 255, 0.2);
+    }
+    
+    &:active {
+      transform: translateY(0);
     }
   }
-  span {
-    color: white;
-    text-transform: uppercase;
+  
+  .signup-link {
+    color: var(--text-secondary);
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    
     a {
-      color: #4e0eff;
+      color: var(--primary-color);
       text-decoration: none;
       font-weight: bold;
+      transition: color 0.3s ease;
+      margin-left: 0.3rem;
+      
+      &:hover {
+        color: var(--secondary-color);
+        text-decoration: underline;
+      }
+    }
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .brand h1 {
+      font-size: 2rem;
+    }
+    
+    .brand img {
+      height: 4rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .brand {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .brand h1 {
+      font-size: 1.8rem;
+    }
+    
+    form {
+      padding: 2rem 1.5rem;
     }
   }
 `;

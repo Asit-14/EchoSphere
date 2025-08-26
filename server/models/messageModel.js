@@ -11,6 +11,16 @@ const MessageSchema = mongoose.Schema(
       ref: "User",
       required: true,
     },
+    isDeleted: {
+      type: Boolean,
+      default: false
+    },
+    // Track users who deleted this message (for "delete for me" feature)
+    deletedFor: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "User",
+      default: []
+    }
   },
   {
     timestamps: true,

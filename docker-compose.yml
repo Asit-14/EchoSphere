@@ -1,10 +1,29 @@
 version: '3.8'
+# When deploying to a different machine, change the REACT_APP_API_URL to the actual server address
 services:
   front:
-    build: ./public
+    build:
+      context: ./public
+      args:
+        - REACT_APP_API_URL=http://localhost:5000
+        - REACT_APP_LOCALHOST_KEY=echosphere-user
     ports:
       - 3000:3000
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000
+      - REACT_APP_LOCALHOST_KEY=echosphere-user
+    depends_on:
+      - api
   api:
-    build: ./server
+    build:
+      context: ./server
+      args:
+        - PORT=5000
+        - MONGO_URL=mongodb+srv://asitshakya789:Fsi%401234@echosphere-db.2mzknvv.mongodb.net/?retryWrites=true&w=majority&appName=echosphere-db
+        - NODE_ENV=production
     ports:
       - 5000:5000
+    environment:
+      - PORT=5000
+      - MONGO_URL=mongodb+srv://asitshakya789:Fsi%401234@echosphere-db.2mzknvv.mongodb.net/?retryWrites=true&w=majority&appName=echosphere-db
+      - NODE_ENV=production

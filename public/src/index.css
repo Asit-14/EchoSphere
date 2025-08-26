@@ -1,4 +1,29 @@
-@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap");
+
+:root {
+  /* New Color Palette - Modern Gradient Theme */
+  --primary-color: #8a2be2;  /* Electric Violet */
+  --primary-light: #a555e9;
+  --primary-dark: #6a0dad;
+  --secondary-color: #00b4d8; /* Vivid Cerulean */
+  --secondary-light: #48cae4;
+  --secondary-dark: #0077b6;
+  --accent-color: #ff7c5c;   /* Coral */
+  --background-dark: #121212;
+  --background-medium: #1e1e2e;
+  --background-light: #2d2d3f;
+  --text-primary: #ffffff;
+  --text-secondary: #e1e1e1;
+  --text-tertiary: #b0b0b0;
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --danger: #ef4444;
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  --box-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.25);
+}
 
 * {
   margin: 0;
@@ -9,15 +34,60 @@
 body,
 button,
 input {
-  font-family: "Josefin Sans", sans-serif;
+  font-family: "Poppins", sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Montserrat", sans-serif;
 }
 
 body {
   max-height: 100vh;
   max-width: 100vw;
   overflow: hidden;
+  color: var(--text-primary);
+  background-color: var(--background-dark);
 }
 
+/* Accessibility - Focus styles */
+*:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-medium);
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-light);
+  border-radius: 8px;
+  transition: var(--transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
+
+/* Toast notification styling */
 .Toastify__toast-theme--dark {
-  background-color: #00000076 !important;
+  background-color: var(--background-medium) !important;
+  color: var(--text-primary) !important;
+  border-left: 4px solid var(--primary-color) !important;
+  border-radius: 8px !important;
+  box-shadow: var(--box-shadow) !important;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 768px) {
+  body {
+    overflow-y: auto;
+  }
 }

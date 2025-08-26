@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8A2BE2" />
+      <stop offset="100%" stop-color="#00B4D8" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  
+  <!-- Main circle background -->
+  <circle cx="100" cy="100" r="85" fill="url(#gradient1)" opacity="0.1" />
+  
+  <!-- Echo waves -->
+  <circle cx="100" cy="100" r="30" stroke="url(#gradient1)" stroke-width="3" fill="none" filter="url(#glow)" />
+  <circle cx="100" cy="100" r="45" stroke="url(#gradient1)" stroke-width="2.5" fill="none" opacity="0.8" filter="url(#glow)" />
+  <circle cx="100" cy="100" r="60" stroke="url(#gradient1)" stroke-width="2" fill="none" opacity="0.6" filter="url(#glow)" />
+  <circle cx="100" cy="100" r="75" stroke="url(#gradient1)" stroke-width="1.5" fill="none" opacity="0.4" filter="url(#glow)" />
+  
+  <!-- Central sphere -->
+  <circle cx="100" cy="100" r="20" fill="url(#gradient1)" filter="url(#glow)" />
+  
+  <!-- Highlights -->
+  <circle cx="94" cy="94" r="6" fill="white" opacity="0.6" />
+  <circle cx="94" cy="94" r="3" fill="white" opacity="0.8" />
+</svg>

@@ -52,92 +52,149 @@ const Container = styled.div`
   display: grid;
   align-items: center;
   grid-template-columns: 5% 95%;
-  background-color: #080420;
-  padding: 0 2rem;
-  @media screen and (min-width: 720px) and (max-width: 1080px) {
-    padding: 0 1rem;
-    gap: 1rem;
+  background-color: var(--background-dark);
+  padding: 0.8rem 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  margin-top: auto;
+  
+  @media screen and (max-width: 1080px) {
+    padding: 0.8rem 1rem;
+    gap: 0.5rem;
   }
+  
+  @media screen and (max-width: 480px) {
+    grid-template-columns: 10% 90%;
+    padding: 0.8rem;
+  }
+  
   .button-container {
     display: flex;
     align-items: center;
     color: white;
     gap: 1rem;
+    
     .emoji {
       position: relative;
+      
       svg {
         font-size: 1.5rem;
-        color: #ffff00c8;
+        color: var(--text-secondary);
         cursor: pointer;
+        transition: color 0.2s ease;
+        
+        &:hover {
+          color: var(--primary-color);
+        }
       }
+      
       .emoji-picker-react {
         position: absolute;
-        top: -350px;
-        background-color: #080420;
-        box-shadow: 0 5px 10px #9a86f3;
-        border-color: #9a86f3;
+        bottom: 60px;
+        left: 0;
+        background-color: var(--background-light);
+        box-shadow: var(--box-shadow);
+        border-color: var(--primary-color);
+        border-radius: 10px;
+        z-index: 10;
+        
         .emoji-scroll-wrapper::-webkit-scrollbar {
-          background-color: #080420;
+          background-color: var(--background-light);
           width: 5px;
+          
           &-thumb {
-            background-color: #9a86f3;
+            background-color: var(--primary-color);
           }
         }
+        
         .emoji-categories {
           button {
             filter: contrast(0);
           }
         }
+        
         .emoji-search {
-          background-color: transparent;
-          border-color: #9a86f3;
+          background-color: rgba(0, 0, 0, 0.2);
+          border-color: var(--primary-color);
         }
+        
         .emoji-group:before {
-          background-color: #080420;
+          background-color: var(--background-light);
         }
       }
     }
   }
+  
   .input-container {
     width: 100%;
-    border-radius: 2rem;
+    border-radius: 24px;
     display: flex;
     align-items: center;
-    gap: 2rem;
-    background-color: #ffffff34;
+    gap: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 0.2rem 0.3rem;
+    transition: box-shadow 0.3s ease;
+    margin-bottom: 0;
+    
+    &:focus-within {
+      box-shadow: 0 0 0 2px rgba(154, 134, 243, 0.3);
+    }
+    
     input {
-      width: 90%;
-      height: 60%;
+      width: 100%;
       background-color: transparent;
-      color: white;
+      color: var(--text-primary);
       border: none;
-      padding-left: 1rem;
-      font-size: 1.2rem;
-
-      &::selection {
-        background-color: #9a86f3;
+      padding: 0.8rem 1rem;
+      font-size: 1rem;
+      
+      &::placeholder {
+        color: var(--text-tertiary);
       }
+      
+      &::selection {
+        background-color: var(--primary-color);
+      }
+      
       &:focus {
         outline: none;
       }
     }
+    
     button {
-      padding: 0.3rem 2rem;
-      border-radius: 2rem;
+      padding: 0.5rem;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: #9a86f3;
+      background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
       border: none;
-      @media screen and (min-width: 720px) and (max-width: 1080px) {
-        padding: 0.3rem 1rem;
-        svg {
-          font-size: 1rem;
-        }
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
       }
+      
+      &:active {
+        transform: translateY(0);
+      }
+      
       svg {
-        font-size: 2rem;
+        font-size: 1.5rem;
         color: white;
+      }
+      
+      @media screen and (max-width: 480px) {
+        width: 38px;
+        height: 38px;
+        
+        svg {
+          font-size: 1.2rem;
+        }
       }
     }
   }
