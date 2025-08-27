@@ -8,7 +8,13 @@ const socket = require("socket.io");
 const path = require("path");
 require("dotenv").config();
 
-app.use(cors());
+// Configure CORS for production
+app.use(cors({
+  origin: process.env.NODE_ENV === "production" 
+    ? ["https://echosphere-frontend.onrender.com", "https://echosphere.onrender.com"]
+    : "http://localhost:3000",
+  credentials: true
+}));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -36,7 +42,9 @@ const server = app.listen(process.env.PORT, () =>
 );
 const io = socket(server, {
   cors: {
-    origin: process.env.NODE_ENV === "production" ? "*" : "http://localhost:3000",
+    origin: process.env.NODE_ENV === "production" 
+      ? ["https://echosphere-frontend.onrender.com", "https://echosphere.onrender.com"]
+      : "http://localhost:3000",
     credentials: true,
   },
 });
