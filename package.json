@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "start": "node server/index.js",
-    "dev": "concurrently \"npm run start --prefix backend\" \"npm run start --prefix frontend\""
+    "dev": "concurrently \"npm run start --prefix backend\" \"npm run start --prefix frontend\"",
+    "install:server": "cd server && npm install",
+    "build": "npm install && npm run install:server"
   },
   "devDependencies": {
     "concurrently": "^9.1.0"
