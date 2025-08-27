@@ -2,7 +2,7 @@
   "version": 2,
   "public": true,
   "cleanUrls": true,
-  "buildCommand": false,
+  "buildCommand": "cd public && npm install --legacy-peer-deps && npm run build",
   "outputDirectory": "public/build",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
