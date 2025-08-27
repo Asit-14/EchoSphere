@@ -11,7 +11,7 @@ require("dotenv").config();
 // Configure CORS for production
 app.use(cors({
   origin: process.env.NODE_ENV === "production" 
-    ? ["https://echosphere-frontend.onrender.com", "https://echosphere.onrender.com"]
+    ? ["https://echosphere-frontend.onrender.com", "https://echosphere-frontend.onrender.app", "https://echosphere.onrender.com"]
     : "http://localhost:3000",
   credentials: true
 }));
@@ -43,7 +43,7 @@ const server = app.listen(process.env.PORT, () =>
 const io = socket(server, {
   cors: {
     origin: process.env.NODE_ENV === "production" 
-      ? ["https://echosphere-frontend.onrender.com", "https://echosphere.onrender.com"]
+      ? ["https://echosphere-frontend.onrender.com", "https://echosphere-frontend.onrender.app", "https://echosphere.onrender.com"]
       : "http://localhost:3000",
     credentials: true,
   },
