@@ -19,11 +19,11 @@ services:
       context: ./server
       args:
         - PORT=5000
-        - MONGO_URL=mongodb+srv://asitshakya789:Fsi%401234@echosphere-db.2mzknvv.mongodb.net/?retryWrites=true&w=majority&appName=echosphere-db
+        - MONGO_URL=${MONGO_URL}
         - NODE_ENV=production
     ports:
       - 5000:5000
     environment:
       - PORT=5000
-      - MONGO_URL=mongodb+srv://asitshakya789:Fsi%401234@echosphere-db.2mzknvv.mongodb.net/?retryWrites=true&w=majority&appName=echosphere-db
+      - MONGO_URL=${MONGO_URL}
       - NODE_ENV=production

@@ -119,7 +119,30 @@ Proudly completed and certified for real-time chat development!
 
 ---
 
-## 🛡️ License
+## � Deployment
+
+For detailed deployment instructions, please refer to our [Deployment Guide](DEPLOYMENT_GUIDE.md).
+
+Quick start:
+```bash
+# With Docker
+docker-compose up -d
+
+# Without Docker
+# Frontend
+cd public
+npm install
+npm run build
+
+# Backend
+cd ../server
+npm install
+npm start
+```
+
+---
+
+## �🛡️ License
 
 This project is licensed under the [MIT License](LICENSE).
 
