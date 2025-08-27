@@ -1,0 +1,15 @@
+{
+  "name": "echosphere-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "18.x"
+  },
+  "scripts": {
+    "start": "npx serve -s"
+  },
+  "dependencies": {
+    "serve": "^14.2.1"
+  }
+}
