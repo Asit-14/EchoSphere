@@ -11,17 +11,24 @@
     "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
+    "@testing-library/dom": "^7.21.4",
+    "@babel/plugin-syntax-flow": "^7.14.5",
+    "@babel/plugin-transform-react-jsx": "^7.14.9",
+    "@babel/core": "^7.0.0",
+    "autoprefixer": "^10.0.2",
     "axios": "^0.28.1",
     "buffer": "^6.0.3",
     "emoji-picker-react": "^3.5.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-is": "^17.0.2",
     "react-icons": "^4.3.1",
     "react-router-dom": "^6.2.1",
     "react-scripts": "5.0.0",
     "react-toastify": "^8.1.1",
     "socket.io-client": "^4.4.1",
     "styled-components": "^5.3.3",
+    "typescript": "^4.5.5",
     "uuid": "^8.3.2",
     "web-vitals": "^2.1.4"
   },
@@ -29,7 +36,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "vercel-build": "npm run build"
   },
   "eslintConfig": {
     "extends": [
