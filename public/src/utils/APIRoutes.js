@@ -10,3 +10,4 @@ export const deleteAllMessagesRoute = `${host}/api/messages/deleteallmsg`;
 export const setAvatarRoute = `${host}/api/auth/setavatar`;
 export const updateUserRoute = `${host}/api/auth/updateuser`;
 export const changePasswordRoute = `${host}/api/auth/changepassword`;
+export const uploadAvatarRoute = `${host}/api/auth/uploadavatar`;

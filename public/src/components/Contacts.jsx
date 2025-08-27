@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Logo from "../assets/echosphere-logo.svg";
+import { useNavigate } from "react-router-dom";
+import { getAvatarUrl } from "../utils/helpers";
 
-export default function Contacts({ contacts, changeChat }) {
+export default function Contacts({ contacts, changeChat, socket }) {
   const [currentUserName, setCurrentUserName] = useState(undefined);
-  const [currentUserImage, setCurrentUserImage] = useState(undefined);
-  const [currentSelected, setCurrentSelected] = useState(undefined);
+  const [currentUserImage, setCurrentUserImage] = useState(undefined);  const [currentSelected, setCurrentSelected] = useState(undefined);
   const [searchTerm, setSearchTerm] = useState("");
   const [isContactsVisible, setIsContactsVisible] = useState(true);
+  const [contactsData, setContactsData] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState(new Set());
+  const navigate = useNavigate();
   
+  // Initial user data load
   useEffect(() => {
     const loadUserData = async () => {
       try {
@@ -26,6 +31,80 @@ export default function Contacts({ contacts, changeChat }) {
     
     loadUserData();
   }, []);
+  
+  // Process contacts data
+  useEffect(() => {
+    setContactsData(contacts);
+  }, [contacts]);
+  
+  // Listen for socket events for avatar updates
+  useEffect(() => {
+    if (socket) {
+      socket.on("avatar-updated", (data) => {
+        // Update contactsData if the avatar of any contact has changed
+        setContactsData(prev => 
+          prev.map(contact => 
+            contact._id === data.userId 
+              ? { ...contact, avatarImage: data.avatarImage } 
+              : contact
+          )
+        );
+        
+        // Also update current user's avatar if it's their update
+        const currentUser = JSON.parse(
+          localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
+        );
+        
+        if (currentUser && currentUser._id === data.userId) {
+          setCurrentUserImage(data.avatarImage);
+          // Update localStorage
+          localStorage.setItem(
+            process.env.REACT_APP_LOCALHOST_KEY,
+            JSON.stringify({
+              ...currentUser,
+              avatarImage: data.avatarImage
+            })
+          );
+        }
+      });
+    }
+    
+    return () => {
+      if (socket) {
+        socket.off("avatar-updated");
+      }
+    };
+  }, [socket]);
+  
+  // Listen for online/offline status changes
+  useEffect(() => {
+    if (socket) {
+      // Listen for status changes of individual users
+      socket.on("user-status-change", (data) => {
+        if (data.status === "online") {
+          setOnlineUsers(prev => new Set([...prev, data.userId]));
+        } else {
+          setOnlineUsers(prev => {
+            const newSet = new Set([...prev]);
+            newSet.delete(data.userId);
+            return newSet;
+          });
+        }
+      });
+      
+      // Get initial list of online users
+      socket.on("get-online-users", (onlineUsersList) => {
+        setOnlineUsers(new Set(onlineUsersList));
+      });
+    }
+    
+    return () => {
+      if (socket) {
+        socket.off("user-status-change");
+        socket.off("get-online-users");
+      }
+    };
+  }, [socket]);
   const changeCurrentChat = (index, contact) => {
     setCurrentSelected(index);
     changeChat(contact);
@@ -36,7 +115,7 @@ export default function Contacts({ contacts, changeChat }) {
   };
   
   // Filter contacts based on search term
-  const filteredContacts = contacts.filter(contact => 
+  const filteredContacts = contactsData.filter(contact => 
     contact.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
@@ -100,7 +179,7 @@ export default function Contacts({ contacts, changeChat }) {
                   >
                     <div className="avatar">
                       <img
-                        src={contact.avatarImage}
+                        src={getAvatarUrl(contact.avatarImage)}
                         alt={`${contact.username}'s avatar`}
                         onError={(e) => {
                           console.error("Failed to load avatar image");
@@ -111,10 +190,11 @@ export default function Contacts({ contacts, changeChat }) {
                           e.target.src = fallbackSvg;
                         }}
                       />
-                      <span className="status-indicator online"></span>
+                      <span className={`status-indicator ${onlineUsers.has(contact._id) ? 'online' : 'offline'}`}></span>
                     </div>
                     <div className="contact-info">
                       <h3 className="username">{contact.username}</h3>
+                      <p className="status-text">{onlineUsers.has(contact._id) ? 'Online' : 'Offline'}</p>
                       <p className="last-message">Click to start chatting</p>
                     </div>
                   </div>
@@ -128,9 +208,9 @@ export default function Contacts({ contacts, changeChat }) {
           </div>
           
           <div className="current-user">
-            <div className="avatar">
+            <div className="avatar" onClick={() => navigate("/profile")}>
               <img
-                src={currentUserImage}
+                src={getAvatarUrl(currentUserImage)}
                 alt={`${currentUserName}'s avatar`}
                 onError={(e) => {
                   console.error("Failed to load avatar image");
@@ -361,15 +441,18 @@ const Container = styled.div`
         
         .status-indicator {
           position: absolute;
-          bottom: 0;
-          right: 0;
-          width: 10px;
-          height: 10px;
+          bottom: 2px;
+          right: 2px;
+          width: 12px;
+          height: 12px;
           border-radius: 50%;
           border: 2px solid var(--background-medium);
+          box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+          transition: all 0.3s ease;
           
           &.online {
             background-color: var(--success);
+            animation: pulse 2s infinite;
           }
           
           &.offline {
@@ -378,6 +461,18 @@ const Container = styled.div`
           
           &.away {
             background-color: var(--warning);
+          }
+          
+          @keyframes pulse {
+            0% {
+              box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4);
+            }
+            70% {
+              box-shadow: 0 0 0 5px rgba(74, 222, 128, 0);
+            }
+            100% {
+              box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
+            }
           }
         }
       }
@@ -391,6 +486,12 @@ const Container = styled.div`
           font-size: 1rem;
           margin-bottom: 0.2rem;
           font-weight: 500;
+        }
+        
+        .status-text {
+          color: var(--text-secondary);
+          font-size: 0.75rem;
+          margin-bottom: 0.2rem;
         }
         
         .last-message {
@@ -440,6 +541,7 @@ const Container = styled.div`
       width: 2.8rem;
       border-radius: 50%;
       overflow: hidden;
+      cursor: pointer;
       
       img {
         height: 100%;
@@ -459,8 +561,12 @@ const Container = styled.div`
       
       .status-indicator.self {
         border-color: rgba(13, 13, 48, 0.6);
-        width: 10px;
-        height: 10px;
+        width: 12px;
+        height: 12px;
+        bottom: 2px;
+        right: 2px;
+        box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+        animation: pulse 2s infinite;
       }
     }
     

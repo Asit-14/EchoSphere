@@ -4,14 +4,29 @@ import { BiPowerOff } from "react-icons/bi";
 import styled from "styled-components";
 import axios from "axios";
 import { logoutRoute } from "../utils/APIRoutes";
-export default function Logout() {
+export default function Logout({ socket }) {
   const navigate = useNavigate();
   const handleClick = async () => {
-    const id = await JSON.parse(
-      localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
-    )._id;
-    const data = await axios.get(`${logoutRoute}/${id}`);
-    if (data.status === 200) {
+    try {
+      const userData = JSON.parse(
+        localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
+      );
+      const id = userData?._id;
+      
+      // Emit logout event to socket if available
+      if (socket && id) {
+        socket.emit("logout", id);
+      }
+      
+      // Call the logout API
+      const data = await axios.get(`${logoutRoute}/${id}`);
+      if (data.status === 200) {
+        localStorage.clear();
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+      // Fallback logout
       localStorage.clear();
       navigate("/login");
     }

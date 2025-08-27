@@ -7,9 +7,11 @@ import axios from "axios";
 import { sendMessageRoute, recieveMessageRoute, deleteMessageRoute, deleteAllMessagesRoute } from "../utils/APIRoutes";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { getAvatarUrl } from "../utils/helpers";
 
-export default function ChatContainer({ currentChat, socket }) {
+export default function ChatContainer({ currentChat: initialChat, socket }) {
   const [messages, setMessages] = useState([]);
+  const [currentChat, setCurrentChat] = useState(initialChat);
   const scrollRef = useRef();
   const messagesEndRef = useRef(null);
   const [arrivalMessage, setArrivalMessage] = useState(null);
@@ -19,6 +21,13 @@ export default function ChatContainer({ currentChat, socket }) {
   const [showMessageActions, setShowMessageActions] = useState(false);
   const [showClearChatModal, setShowClearChatModal] = useState(false);
   
+  // Update currentChat when initialChat changes
+  useEffect(() => {
+    if (initialChat) {
+      setCurrentChat(initialChat);
+    }
+  }, [initialChat]);
+
   // Fetch messages when chat changes
   useEffect(() => {
     const loadMessages = async () => {
@@ -43,6 +52,26 @@ export default function ChatContainer({ currentChat, socket }) {
     
     loadMessages();
   }, [currentChat]);
+  
+  // Listen for avatar updates
+  useEffect(() => {
+    if (socket) {
+      socket.on("avatar-updated", (data) => {
+        if (currentChat && currentChat._id === data.userId) {
+          setCurrentChat(prev => ({
+            ...prev,
+            avatarImage: data.avatarImage
+          }));
+        }
+      });
+    }
+    
+    return () => {
+      if (socket) {
+        socket.off("avatar-updated");
+      }
+    };
+  }, [socket, currentChat]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -51,14 +80,14 @@ export default function ChatContainer({ currentChat, socket }) {
   // Set up socket when chat changes
   useEffect(() => {
     const getCurrentChat = async () => {
-      if (currentChat && socket.current) {
+      if (currentChat && socket) {
         try {
           const userData = JSON.parse(
             localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
           );
           
           // Tell the server which chat we're in
-          socket.current.emit("join-chat", {
+          socket.emit("join-chat", {
             chatId: currentChat._id,
             userId: userData._id
           });
@@ -80,15 +109,15 @@ export default function ChatContainer({ currentChat, socket }) {
       );
       
       // Emit the message via socket
-      if (socket.current) {
-        socket.current.emit("send-msg", {
+      if (socket) {
+        socket.emit("send-msg", {
           to: currentChat._id,
           from: data._id,
           msg,
         });
         
         // Stop typing indicator
-        socket.current.emit("stop-typing", {
+        socket.emit("stop-typing", {
           to: currentChat._id,
           from: data._id,
         });
@@ -125,8 +154,8 @@ export default function ChatContainer({ currentChat, socket }) {
         localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
       );
       
-      if (socket.current) {
-        socket.current.emit(isTyping ? "typing" : "stop-typing", {
+      if (socket) {
+        socket.emit(isTyping ? "typing" : "stop-typing", {
           to: currentChat._id,
           from: data._id,
         });
@@ -138,49 +167,47 @@ export default function ChatContainer({ currentChat, socket }) {
 
   // Listen for incoming messages and other socket events
   useEffect(() => {
-    // Store socket reference to use in cleanup
-    const socketRef = socket.current;
-    
-    if (socketRef) {
-      socketRef.on("msg-receive", (msg) => {
-        const timestamp = new Date().toISOString();
+    if (socket) {
+      socket.on("msg-receive", (messageData) => {
+        console.log("Message received:", messageData);
         setArrivalMessage({ 
           fromSelf: false, 
-          message: msg,
-          timestamp 
+          message: messageData.message,
+          timestamp: messageData.timestamp || new Date().toISOString(),
+          sender: messageData.sender
         });
         setIsTyping(false);
       });
       
       // Handle message deletion from other clients
-      socketRef.on("msg-deleted", (messageId) => {
+      socket.on("msg-deleted", (messageId) => {
         setMessages(prev => prev.filter(msg => msg.messageId !== messageId));
         toast.info("A message was deleted");
       });
       
       // Handle chat cleared from other clients
-      socketRef.on("chat-cleared", (fromUserId) => {
+      socket.on("chat-cleared", (fromUserId) => {
         setMessages([]);
         toast.info("Chat history was cleared");
       });
       
-      socketRef.on("typing", () => {
+      socket.on("typing", () => {
         setIsTyping(true);
       });
       
-      socketRef.on("stop-typing", () => {
+      socket.on("stop-typing", () => {
         setIsTyping(false);
       });
     }
     
-    // Cleanup listeners on unmount using the stored reference
+    // Cleanup listeners on unmount
     return () => {
-      if (socketRef) {
-        socketRef.off("msg-receive");
-        socketRef.off("msg-deleted");
-        socketRef.off("chat-cleared");
-        socketRef.off("typing");
-        socketRef.off("stop-typing");
+      if (socket) {
+        socket.off("msg-receive");
+        socket.off("msg-deleted");
+        socket.off("chat-cleared");
+        socket.off("typing");
+        socket.off("stop-typing");
       }
     };
   }, [socket]);
@@ -285,7 +312,7 @@ export default function ChatContainer({ currentChat, socket }) {
         <div className="user-details">
           <div className="avatar">
             <img
-              src={currentChat.avatarImage}
+              src={getAvatarUrl(currentChat.avatarImage)}
               alt={`${currentChat.username}'s avatar`}
               onError={(e) => {
                 console.error("Failed to load avatar image");
@@ -322,7 +349,7 @@ export default function ChatContainer({ currentChat, socket }) {
           <button className="action-btn" aria-label="More options">
             <i className="fas fa-ellipsis-h"></i>
           </button>
-          <Logout />
+          <Logout socket={socket} />
         </div>
       </div>
       

@@ -6,6 +6,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import loader from "../assets/loader.gif";
 import { updateUserRoute, changePasswordRoute } from "../utils/APIRoutes";
+import AvatarUpload from "./AvatarUpload";
+import { getAvatarUrl } from "../utils/helpers";
 
 export default function ProfileSettings() {
   const navigate = useNavigate();
@@ -171,6 +173,10 @@ export default function ProfileSettings() {
     navigate("/setAvatar");
   };
   
+  const refreshUser = (updatedUser) => {
+    setUser(updatedUser);
+  };
+  
   return (
     <>
       {isLoading ? (
@@ -189,23 +195,32 @@ export default function ProfileSettings() {
           <div className="profile-content">
             <div className="avatar-section">
               <div className="avatar-container">
-                <img
-                  src={user?.avatarImage}
-                  alt="Profile"
-                  className="profile-avatar"
-                  onError={(e) => {
-                    console.error("Failed to load avatar image");
-                    // Use a simple colored circle with first letter of username as fallback
-                    const colors = ["#3498db", "#e74c3c", "#2ecc71", "#9b59b6"];
-                    const colorIndex = user.username.charCodeAt(0) % colors.length;
-                    const fallbackSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="${colors[colorIndex]}"/><text x="50" y="62" font-family="Arial" font-size="40" text-anchor="middle" fill="white">${user.username[0].toUpperCase()}</text></svg>`;
-                    e.target.src = fallbackSvg;
-                  }}
-                />
+                {user?.avatarImage ? (
+                  <img
+                    src={getAvatarUrl(user.avatarImage)}
+                    alt="Profile"
+                    className="profile-avatar"
+                    onError={(e) => {
+                      console.error("Failed to load avatar image");
+                      // Use a simple colored circle with first letter of username as fallback
+                      const colors = ["#3498db", "#e74c3c", "#2ecc71", "#9b59b6"];
+                      const colorIndex = user.username.charCodeAt(0) % colors.length;
+                      const fallbackSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="${colors[colorIndex]}"/><text x="50" y="62" font-family="Arial" font-size="40" text-anchor="middle" fill="white">${user.username[0].toUpperCase()}</text></svg>`;
+                      e.target.src = fallbackSvg;
+                    }}
+                  />
+                ) : (
+                  <div className="avatar-placeholder">
+                    {user?.username ? user.username[0].toUpperCase() : "?"}
+                  </div>
+                )}
               </div>
-              <button className="change-avatar-btn" onClick={handleChangeAvatar}>
-                Change Avatar
-              </button>
+              <div className="avatar-actions">
+                <AvatarUpload currentUser={user} refreshUser={refreshUser} />
+                <button className="change-avatar-btn" onClick={handleChangeAvatar}>
+                  Select Preset Avatar
+                </button>
+              </div>
             </div>
             
             <div className="info-section">

@@ -5,10 +5,12 @@ const authRoutes = require("./routes/auth");
 const messageRoutes = require("./routes/messages");
 const app = express();
 const socket = require("socket.io");
+const path = require("path");
 require("dotenv").config();
 
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 mongoose
   .connect(process.env.MONGO_URL, {
@@ -42,14 +44,36 @@ const io = socket(server, {
 global.onlineUsers = new Map();
 io.on("connection", (socket) => {
   global.chatSocket = socket;
+  
+  // Handle user coming online
   socket.on("add-user", (userId) => {
     onlineUsers.set(userId, socket.id);
+    
+    // Broadcast to all clients that this user is online
+    socket.broadcast.emit("user-status-change", {
+      userId: userId,
+      status: "online"
+    });
+    
+    // Send the current list of online users to this newly connected user
+    const onlineUsersList = Array.from(onlineUsers.keys());
+    socket.emit("get-online-users", onlineUsersList);
+  });
+
+  // New socket event to handle avatar updates
+  socket.on("avatar-change", (data) => {
+    socket.broadcast.emit("avatar-updated", data);
   });
 
   socket.on("send-msg", (data) => {
     const sendUserSocket = onlineUsers.get(data.to);
     if (sendUserSocket) {
-      socket.to(sendUserSocket).emit("msg-receive", data.msg);
+      socket.to(sendUserSocket).emit("msg-receive", {
+        fromSelf: false,
+        message: data.msg,
+        timestamp: new Date().toISOString(),
+        sender: data.from
+      });
     }
   });
   
@@ -80,6 +104,39 @@ io.on("connection", (socket) => {
     const sendUserSocket = onlineUsers.get(data.to);
     if (sendUserSocket) {
       socket.to(sendUserSocket).emit("stop-typing");
+    }
+  });
+  
+  // Handle user going offline
+  socket.on("disconnect", () => {
+    // Find the user ID associated with this socket
+    let disconnectedUserId = null;
+    onlineUsers.forEach((socketId, userId) => {
+      if (socketId === socket.id) {
+        disconnectedUserId = userId;
+      }
+    });
+    
+    if (disconnectedUserId) {
+      // Remove user from online users
+      onlineUsers.delete(disconnectedUserId);
+      
+      // Broadcast to all clients that this user is offline
+      socket.broadcast.emit("user-status-change", {
+        userId: disconnectedUserId,
+        status: "offline"
+      });
+    }
+  });
+  
+  // Handle explicit logout
+  socket.on("logout", (userId) => {
+    if (userId) {
+      onlineUsers.delete(userId);
+      socket.broadcast.emit("user-status-change", {
+        userId: userId,
+        status: "offline"
+      });
     }
   });
 });

@@ -61,7 +61,7 @@ export default function Chat() {
     <>
       <Container>
         <div className="container">
-          <Contacts contacts={contacts} changeChat={handleChatChange} />
+          <Contacts contacts={contacts} changeChat={handleChatChange} socket={socket.current} />
           {currentChat === undefined ? (
             <Welcome />
           ) : (
@@ -75,7 +75,7 @@ export default function Chat() {
                   <i className="fas fa-users"></i>
                 </button>
               </div>
-              <ChatContainer currentChat={currentChat} socket={socket} />
+              <ChatContainer currentChat={currentChat} socket={socket.current} />
             </>
           )}
         </div>
