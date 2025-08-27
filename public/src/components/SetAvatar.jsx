@@ -313,8 +313,8 @@ const Container = styled.div`
       }
       
       .avatar-preview {
-        width: 70px;
-        height: 70px;
+        width: 80px;
+        height: 80px;
         border-radius: 50%;
         overflow: hidden;
         margin-bottom: 12px;
@@ -323,16 +323,16 @@ const Container = styled.div`
         display: flex;
         justify-content: center;
         align-items: center;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
         
-        .small-preview {
+          .small-preview {
           height: 100%;
           width: 100%;
           display: block;
-          object-fit: contain;
+          object-fit: cover;
           border-radius: 50%;
-        }
-        
-        .avatar-fallback {
+        }        .avatar-fallback {
           width: 100%;
           height: 100%;
           border-radius: 50%;
@@ -365,6 +365,14 @@ const Container = styled.div`
         
         .avatar-preview {
           border-color: var(--primary-light);
+          border-width: 3px;
+          animation: pulse-border 1.5s infinite;
+        }
+        
+        @keyframes pulse-border {
+          0% { box-shadow: 0 0 0 0 rgba(138, 43, 226, 0.7); }
+          70% { box-shadow: 0 0 0 10px rgba(138, 43, 226, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(138, 43, 226, 0); }
         }
       }
       
@@ -384,12 +392,17 @@ const Container = styled.div`
         width: 100%;
         transition: var(--transition-normal);
         border-radius: 50%;
-        object-fit: contain;
+        object-fit: cover;
         background-color: rgba(255, 255, 255, 0.2);
         padding: 0;
         
         &:focus {
           outline: none;
+        }
+        
+        &:hover {
+          transform: scale(1.05);
+          box-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
         }
       }
     }

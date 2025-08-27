@@ -110,7 +110,13 @@ const Container = styled.div`
       box-shadow: var(--box-shadow);
       z-index: 2;
       position: relative;
-      object-fit: contain;
+      object-fit: cover;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: scale(1.05);
+        border: 2px solid var(--primary-color);
+      }
     }
     
     .avatar-glow {

@@ -346,11 +346,17 @@ const Container = styled.div`
           height: 100%;
           width: 100%;
           border-radius: 50%;
-          object-fit: contain;
+          object-fit: cover;
           background-color: rgba(255, 255, 255, 0.2);
           border: 2px solid transparent;
-          transition: var(--transition-fast);
+          transition: all 0.3s ease;
           padding: 0.2rem;
+          
+          &:hover {
+            border: 2px solid var(--primary-color);
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
+          }
         }
         
         .status-indicator {
@@ -439,10 +445,16 @@ const Container = styled.div`
         height: 100%;
         width: 100%;
         border-radius: 50%;
-        object-fit: contain;
+        object-fit: cover;
         background-color: rgba(255, 255, 255, 0.2);
         border: 2px solid var(--primary-color);
         padding: 0.2rem;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          transform: scale(1.05);
+          box-shadow: 0 0 10px rgba(138, 43, 226, 0.7);
+        }
       }
       
       .status-indicator.self {

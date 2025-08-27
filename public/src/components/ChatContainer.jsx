@@ -472,11 +472,16 @@ const Container = styled.div`
         height: 100%;
         width: 100%;
         border-radius: 50%;
-        object-fit: contain;
+        object-fit: cover;
         border: 2px solid transparent;
         background-color: rgba(255, 255, 255, 0.2);
-        transition: var(--transition-fast);
-        padding: 0.2rem;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          border: 2px solid var(--primary-color);
+          transform: scale(1.05);
+          box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.5);
+        }
       }        .status-indicator {
           position: absolute;
           bottom: 0;
@@ -523,23 +528,24 @@ const Container = styled.div`
       margin-left: auto; /* Push to right side */
       
       .action-btn {
-        background: none;
+        background: rgba(255, 255, 255, 0.1);
         border: none;
         color: var(--text-secondary);
         font-size: 1.2rem;
         cursor: pointer;
         padding: 0.4rem;
         border-radius: 50%;
-        width: 35px;
-        height: 35px;
+        width: 38px;
+        height: 38px;
         display: flex;
         align-items: center;
         justify-content: center;
         transition: var(--transition-fast);
         
         &:hover, &:focus {
-          background-color: rgba(255, 255, 255, 0.1);
+          background-color: rgba(255, 255, 255, 0.2);
           color: var(--text-primary);
+          transform: scale(1.1);
         }
       }
     }
@@ -610,16 +616,22 @@ const Container = styled.div`
       
       .content {
         overflow-wrap: break-word;
-        padding: 0.8rem 1rem;
+        padding: 1rem 1.2rem;
         font-size: 0.95rem;
         position: relative;
         border-radius: 16px;
         color: var(--text-primary);
         box-shadow: var(--box-shadow);
+        transition: transform 0.2s ease;
+        
+        &:hover {
+          transform: translateY(-2px);
+        }
         
         p {
           margin-bottom: 0.5rem;
-          line-height: 1.4;
+          line-height: 1.5;
+          letter-spacing: 0.01em;
         }
         
         .timestamp {
@@ -627,6 +639,7 @@ const Container = styled.div`
           font-size: 0.7rem;
           color: var(--text-tertiary);
           text-align: right;
+          margin-top: 0.2rem;
         }
       }
     }
@@ -681,9 +694,11 @@ const Container = styled.div`
   @keyframes bounce {
     0%, 80%, 100% {
       transform: translateY(0);
+      opacity: 0.8;
     }
     40% {
-      transform: translateY(-6px);
+      transform: translateY(-8px);
+      opacity: 1;
     }
   }
   
@@ -699,10 +714,12 @@ const Container = styled.div`
   
   .message:hover .message-options {
     opacity: 0.7;
+    transform: scale(1);
   }
   
   .message:hover .message-options:hover {
     opacity: 1;
+    transform: scale(1.15);
   }
   
   .message.selected {
@@ -823,7 +840,13 @@ const Container = styled.div`
   }
   
   @keyframes slideIn {
-    from { transform: translateY(20px); opacity: 0; }
+    from { transform: translateY(30px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
+  }
+  
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.6); }
+    70% { box-shadow: 0 0 0 10px rgba(var(--primary-rgb), 0); }
+    100% { box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0); }
   }
 `;
