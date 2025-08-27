@@ -1,0 +1,13 @@
+{
+  "name": "echosphere-frontend-static",
+  "version": "1.0.0",
+  "engines": {
+    "node": "16.x"
+  },
+  "scripts": {
+    "start": "npx serve -s build"
+  },
+  "dependencies": {
+    "serve": "^14.2.1"
+  }
+}

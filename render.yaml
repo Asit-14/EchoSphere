@@ -2,13 +2,10 @@ services:
   - type: web
     name: echosphere-frontend
     env: static
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./build
+    buildCommand: cp ./public/deploy-package.json ./public/build/package.json && cd ./public/build && npm install --production
+    staticPublishPath: ./public/build
     envVars:
       - key: REACT_APP_API_URL
         value: https://echosphere-2fpq.onrender.com
       - key: REACT_APP_LOCALHOST_KEY
         value: echosphere-user
-    buildFilter:
-      paths:
-        - public/**/*
