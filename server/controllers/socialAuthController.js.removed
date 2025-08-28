@@ -1,0 +1,78 @@
+/**
+ * This file contains the previous implementation of social authentication controllers.
+ * It has been removed as part of the simplification of the authentication system.
+ * 
+ * The application now uses only username/password authentication.
+ * 
+ * This file is kept as a reference in case social login needs to be re-implemented in the future.
+ */
+
+const jwt = require('jsonwebtoken');
+const User = require('../models/userModel');
+
+// Generate JWT token
+const generateToken = (user) => {
+  return jwt.sign(
+    { id: user._id, provider: user.provider },
+    process.env.JWT_SECRET,
+    { expiresIn: '7d' }
+  );
+};
+
+// Process successful OAuth authentication
+const processOAuthCallback = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.redirect(`${process.env.CLIENT_URL}/login?error=authentication_failed`);
+    }
+    
+    const token = generateToken(req.user);
+    
+    // Create a user object without password
+    const user = await User.findById(req.user._id).select('-password');
+    
+    // Redirect to the client with token
+    return res.redirect(`${process.env.CLIENT_URL}/oauth-callback?token=${token}`);
+  } catch (error) {
+    console.error('OAuth callback error:', error);
+    return res.redirect(`${process.env.CLIENT_URL}/login?error=server_error`);
+  }
+};
+
+// Verify token and return user
+module.exports.verifyToken = async (req, res, next) => {
+  try {
+    const { token } = req.body;
+    
+    if (!token) {
+      return res.json({ status: false, msg: 'No token provided' });
+    }
+    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select('-password');
+    
+    if (!user) {
+      return res.json({ status: false, msg: 'User not found' });
+    }
+    
+    return res.json({ status: true, user });
+  } catch (error) {
+    console.error('Token verification error:', error);
+    return res.json({ status: false, msg: 'Invalid token' });
+  }
+};
+
+// Google OAuth callback
+module.exports.googleCallback = (req, res) => {
+  return processOAuthCallback(req, res);
+};
+
+// GitHub OAuth callback
+module.exports.githubCallback = (req, res) => {
+  return processOAuthCallback(req, res);
+};
+
+// Facebook OAuth callback
+module.exports.facebookCallback = (req, res) => {
+  return processOAuthCallback(req, res);
+};

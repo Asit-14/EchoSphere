@@ -1,0 +1,33 @@
+/**
+ * This file contains the previous Passport.js configuration for social authentication.
+ * It has been removed as part of the simplification of the authentication system.
+ * 
+ * The application now uses only username/password authentication.
+ * 
+ * This file is kept as a reference in case social login needs to be re-implemented in the future.
+ */
+
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const GithubStrategy = require('passport-github2').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
+const User = require('../models/userModel');
+
+// Serialize user for session
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+// Deserialize user from session
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (err) {
+    done(err, null);
+  }
+});
+
+// Strategies have been removed as they are no longer used
+// If you need to restore social login functionality in the future,
+// please consult the SOCIAL_LOGIN_SETUP.md document for guidance.

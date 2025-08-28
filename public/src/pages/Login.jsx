@@ -120,10 +120,6 @@ export default function Login() {
           
           <button type="submit">Log In</button>
           
-          <div className="divider">
-            <span>OR</span>
-          </div>
-          
           <SocialLogin />
           
           <span className="signup-link">

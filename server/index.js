@@ -1,8 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const passport = require("passport");
-const session = require("express-session");
 const authRoutes = require("./routes/auth");
 const messageRoutes = require("./routes/messages");
 const app = express();
@@ -22,23 +20,7 @@ app.use(cors({
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Initialize session
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'echosphere_secret',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }
-}));
-
-// Initialize passport
-app.use(passport.initialize());
-app.use(passport.session());
-
-// Import passport config explicitly
-require('./config/passport'); // Ensure passport strategies are loaded
+// No session or passport initialization required anymore
 
 mongoose
   .connect(process.env.MONGO_URL, {

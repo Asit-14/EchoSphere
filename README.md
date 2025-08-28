@@ -13,7 +13,7 @@ Crafted with passion by [Asit-14](https://github.com/Asit-14), EchoSphere brings
 - **Direct Messaging:** Enjoy instant, secure communication.
 - **Real-Time Updates:** Powered by WebSocket for lightning-fast message delivery.
 - **Responsive UI:** Beautifully designed for both desktop and mobile.
-- **Secure Authentication:** Robust login and registration for privacy and protection.
+- **Simple Authentication:** Clean username/password authentication for easy access.
 - **Message History:** Never lose important conversations.
 
 ---

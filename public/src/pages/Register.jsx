@@ -166,10 +166,6 @@ export default function Register() {
           
           <button type="submit">Create Account</button>
           
-          <div className="divider">
-            <span>OR</span>
-          </div>
-          
           <SocialLogin />
           
           <span className="login-link">
