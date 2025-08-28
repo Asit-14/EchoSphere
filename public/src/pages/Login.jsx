@@ -5,6 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { loginRoute } from "../utils/APIRoutes";
+import { getUserFromStorage, saveUserToStorage } from "../utils/helpers";
 // Import Font Awesome CSS
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
@@ -19,7 +20,7 @@ export default function Login() {
     theme: "dark",
   };
   useEffect(() => {
-    if (localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)) {
+    if (getUserFromStorage()) {
       navigate("/");
     }
   }, [navigate]);
@@ -43,21 +44,30 @@ export default function Login() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (validateForm()) {
-      const { username, password } = values;
-      const { data } = await axios.post(loginRoute, {
-        username,
-        password,
-      });
-      if (data.status === false) {
-        toast.error(data.msg, toastOptions);
-      }
-      if (data.status === true) {
-        localStorage.setItem(
-          process.env.REACT_APP_LOCALHOST_KEY,
-          JSON.stringify(data.user)
-        );
-
-        navigate("/");
+      try {
+        const { username, password } = values;
+        console.log("Login attempt with username:", username);
+        console.log("API URL being used:", loginRoute);
+        
+        const { data } = await axios.post(loginRoute, {
+          username,
+          password,
+        });
+        
+        console.log("Login response:", data);
+        
+        if (data.status === false) {
+          console.log("Login failed:", data.msg);
+          toast.error(data.msg, toastOptions);
+        }
+        if (data.status === true) {
+          console.log("Login successful, saving user to storage");
+          saveUserToStorage(data.user);
+          navigate("/");
+        }
+      } catch (error) {
+        console.error("Login error:", error);
+        toast.error("An error occurred during login. Please try again.", toastOptions);
       }
     }
   };

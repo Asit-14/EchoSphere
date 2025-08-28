@@ -12,7 +12,8 @@ require("dotenv").config();
 app.use(cors({
   origin: process.env.NODE_ENV === "production" 
     ? ["https://echosphere-frontend.onrender.com", "https://echosphere-frontend.onrender.app", 
-       "https://echosphere.onrender.com", "https://next-js-ai-chatbot.vercel.app"]
+       "https://echosphere.onrender.com", "https://next-js-ai-chatbot.vercel.app",
+       "https://echo-spheres.vercel.app"]
     : "http://localhost:3000",
   credentials: true
 }));
@@ -45,7 +46,8 @@ const io = socket(server, {
   cors: {
     origin: process.env.NODE_ENV === "production" 
       ? ["https://echosphere-frontend.onrender.com", "https://echosphere-frontend.onrender.app", 
-         "https://echosphere.onrender.com", "https://next-js-ai-chatbot.vercel.app"]
+         "https://echosphere.onrender.com", "https://next-js-ai-chatbot.vercel.app",
+         "https://echo-spheres.vercel.app"]
       : "http://localhost:3000",
     credentials: true,
   },
