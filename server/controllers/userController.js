@@ -187,3 +187,38 @@ module.exports.changePassword = async (req, res, next) => {
     next(ex);
   }
 };
+
+module.exports.deleteAccount = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    const { password } = req.body;
+    
+    // Find the user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.json({ msg: "User not found", status: false });
+    }
+    
+    // Verify password for security
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.json({ msg: "Password is incorrect", status: false });
+    }
+    
+    // Delete the user
+    await User.findByIdAndDelete(userId);
+    
+    // If we have global online users map, remove the user from it
+    if (global.onlineUsers && global.onlineUsers.has(userId)) {
+      global.onlineUsers.delete(userId);
+    }
+    
+    return res.json({ 
+      status: true, 
+      msg: "Account deleted successfully" 
+    });
+  } catch (ex) {
+    console.error("Delete account error:", ex);
+    next(ex);
+  }
+};
