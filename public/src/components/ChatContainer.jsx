@@ -469,6 +469,18 @@ const Container = styled.div`
   @media screen and (max-width: 768px) {
     border-radius: 0;
     max-height: 100vh;
+    height: calc(100vh - 60px); /* Account for navigation */
+  }
+  
+  @media screen and (max-width: 480px) {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
   
   .chat-header {
@@ -588,6 +600,12 @@ const Container = styled.div`
     height: 100%;
     scrollbar-width: thin;
     margin: 0;
+    
+    @media screen and (max-width: 480px) {
+      padding-bottom: 80px; /* Make room for the fixed input */
+      flex: 1;
+      height: calc(100% - 130px);
+    }
     
     &::-webkit-scrollbar {
       width: 6px;

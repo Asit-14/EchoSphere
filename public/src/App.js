@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, Link, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from "react-router-dom";
 import styled from "styled-components";
 import SetAvatar from "./components/SetAvatar";
 import Chat from "./pages/Chat";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
+import { getUserFromStorage } from "./utils/helpers";
 
 // Navigation component
 const Navigation = () => {
@@ -13,9 +14,8 @@ const Navigation = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   
   useEffect(() => {
-    // Check if user is logged in
-    const userKey = process.env.REACT_APP_LOCALHOST_KEY || "echosphere-user";
-    const user = localStorage.getItem(userKey);
+    // Check if user is logged in using our helper function
+    const user = getUserFromStorage();
     setIsLoggedIn(!!user);
   }, [location.pathname]);
   

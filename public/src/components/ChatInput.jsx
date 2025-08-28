@@ -66,6 +66,12 @@ const Container = styled.div`
   @media screen and (max-width: 480px) {
     grid-template-columns: 10% 90%;
     padding: 0.8rem;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 100;
   }
   
   .button-container {
@@ -96,7 +102,13 @@ const Container = styled.div`
         box-shadow: var(--box-shadow);
         border-color: var(--primary-color);
         border-radius: 10px;
-        z-index: 10;
+        z-index: 20;
+        
+        @media screen and (max-width: 480px) {
+          bottom: 70px;
+          left: -40px;
+          width: 280px !important;
+        }
         
         .emoji-scroll-wrapper::-webkit-scrollbar {
           background-color: var(--background-light);

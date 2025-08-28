@@ -7,6 +7,7 @@ import { allUsersRoute, host } from "../utils/APIRoutes";
 import ChatContainer from "../components/ChatContainer";
 import Contacts from "../components/Contacts";
 import Welcome from "../components/Welcome";
+import { getUserFromStorage } from "../utils/helpers";
 // Import Font Awesome CSS
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
@@ -18,12 +19,10 @@ export default function Chat() {
   const [currentUser, setCurrentUser] = useState(undefined);
   useEffect(() => {
     const checkUser = async () => {
-      if (!localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)) {
+      const userData = getUserFromStorage();
+      if (!userData) {
         navigate("/login");
       } else {
-        const userData = JSON.parse(
-          localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
-        );
         setCurrentUser(userData);
       }
     };
@@ -200,6 +199,13 @@ const Container = styled.div`
       width: 100vw;
       border-radius: 0;
       grid-template-rows: auto 1fr;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      transform: none;
+      overflow-y: auto;
     }
     
     .mobile-toggle-container {
