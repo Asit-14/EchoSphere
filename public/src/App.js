@@ -6,6 +6,7 @@ import Chat from "./pages/Chat";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
+import OAuthCallback from "./pages/OAuthCallback";
 import { getUserFromStorage } from "./utils/helpers";
 
 // Navigation component
@@ -116,6 +117,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/setAvatar" element={<SetAvatar />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/oauth-callback" element={<OAuthCallback />} />
           <Route path="/" element={<Chat />} />
         </Routes>
       </main>

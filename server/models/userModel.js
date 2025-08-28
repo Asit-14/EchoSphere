@@ -16,7 +16,10 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
+    required: function() {
+      // Password is required only if no social login is used
+      return !this.googleId && !this.facebookId && !this.githubId;
+    },
     min: 8,
   },
   isAvatarImageSet: {
@@ -31,6 +34,27 @@ const userSchema = new mongoose.Schema({
     type: Number,
     required: false,
   },
+  // Social login fields
+  googleId: {
+    type: String,
+    sparse: true,
+    unique: true,
+  },
+  facebookId: {
+    type: String,
+    sparse: true,
+    unique: true,
+  },
+  githubId: {
+    type: String,
+    sparse: true,
+    unique: true,
+  },
+  provider: {
+    type: String,
+    enum: ['local', 'google', 'facebook', 'github'],
+    default: 'local'
+  }
 });
 
 module.exports = mongoose.model("Users", userSchema);

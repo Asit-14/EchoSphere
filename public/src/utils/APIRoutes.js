@@ -12,3 +12,9 @@ export const updateUserRoute = `${host}/api/auth/updateuser`;
 export const changePasswordRoute = `${host}/api/auth/changepassword`;
 export const deleteAccountRoute = `${host}/api/auth/deleteaccount`;
 export const uploadAvatarRoute = `${host}/api/auth/uploadavatar`;
+
+// Social login routes
+export const googleAuthRoute = `${host}/api/auth/google`;
+export const githubAuthRoute = `${host}/api/auth/github`;
+export const facebookAuthRoute = `${host}/api/auth/facebook`;
+export const verifyTokenRoute = `${host}/api/auth/verify-token`;
