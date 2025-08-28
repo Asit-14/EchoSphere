@@ -190,23 +190,28 @@ export default function ProfileSettings() {
     
     try {
       setIsLoading(true);
+      console.log("Deleting account for user:", user._id);
+      console.log("Delete account URL:", `${deleteAccountRoute}/${user._id}`);
+      
       const { data } = await axios.post(`${deleteAccountRoute}/${user._id}`, {
         password: deletePassword,
       });
       
+      console.log("Delete account response:", data);
+      
       if (data.status === true) {
         toast.success("Your account has been deleted", toastOptions);
-        localStorage.clear();
+        localStorage.removeItem(process.env.REACT_APP_LOCALHOST_KEY);
         setTimeout(() => {
           navigate("/login");
         }, 2000);
       } else {
         toast.error(data.msg || "Failed to delete account", toastOptions);
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Error deleting account:", error);
-      toast.error("An error occurred. Please try again.", toastOptions);
-    } finally {
+      toast.error(error.response?.data?.msg || "An error occurred. Please try again.", toastOptions);
       setIsLoading(false);
     }
   };
@@ -398,25 +403,26 @@ export default function ProfileSettings() {
                 
                 {isConfirmingDelete && (
                   <div className="delete-account-confirmation">
-                    <h3>Are you sure you want to delete your account?</h3>
-                    <p>This action cannot be undone. All your data will be permanently removed.</p>
+                    <h3>⚠️ Delete Account Permanently</h3>
+                    <p>This action cannot be undone. All your data, messages, and profile information will be permanently removed from our servers.</p>
                     
                     <form onSubmit={handleDeleteAccount} className="delete-account-form">
                       <div className="form-group">
-                        <label htmlFor="deletePassword">Enter your password to confirm</label>
+                        <label htmlFor="deletePassword">Enter your password to confirm deletion:</label>
                         <input
                           type="password"
                           id="deletePassword"
                           value={deletePassword}
                           onChange={(e) => setDeletePassword(e.target.value)}
-                          placeholder="Enter your password"
+                          placeholder="Enter your current password"
+                          autoFocus
                           required
                         />
                       </div>
                       
                       <div className="form-buttons">
                         <button type="submit" className="confirm-delete-btn">
-                          Delete My Account
+                          Permanently Delete My Account
                         </button>
                         <button
                           type="button"
@@ -689,12 +695,30 @@ const Container = styled.div`
     
     .danger-zone {
       margin-top: 1rem;
+      padding: 1.5rem;
+      background: rgba(231, 76, 60, 0.08);
+      border: 2px solid rgba(231, 76, 60, 0.3);
+      border-radius: 8px;
+      position: relative;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      
+      &::before {
+        content: "⚠️";
+        position: absolute;
+        top: -15px;
+        left: 20px;
+        font-size: 1.5rem;
+        background: var(--background-dark);
+        padding: 0 10px;
+      }
       
       h2 {
         color: #e74c3c;
         font-size: 1.2rem;
         font-weight: 600;
         margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
       }
 
       .danger-actions {
@@ -715,6 +739,13 @@ const Container = styled.div`
         
         &:hover {
           background: rgba(231, 76, 60, 0.2);
+          transform: translateY(-2px);
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        &:active {
+          transform: translateY(0);
+          box-shadow: none;
         }
       }
 
@@ -722,31 +753,51 @@ const Container = styled.div`
         background: rgba(231, 76, 60, 0.15);
         color: #e74c3c;
         border: 1px solid rgba(231, 76, 60, 0.6);
+        font-weight: 600;
 
         &:hover {
           background: rgba(231, 76, 60, 0.25);
+          animation: pulse-warning 2s infinite;
+        }
+        
+        @keyframes pulse-warning {
+          0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+          70% { box-shadow: 0 0 0 6px rgba(231, 76, 60, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
         }
       }
       
       .delete-account-confirmation {
         margin-top: 1.5rem;
         padding: 1.5rem;
-        background: rgba(231, 76, 60, 0.05);
-        border: 1px solid rgba(231, 76, 60, 0.3);
+        background: rgba(231, 76, 60, 0.1);
+        border: 2px solid rgba(231, 76, 60, 0.5);
         border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        animation: highlight-danger 1s ease-out;
+        
+        @keyframes highlight-danger {
+          0% { transform: scale(0.95); opacity: 0; }
+          100% { transform: scale(1); opacity: 1; }
+        }
         
         h3 {
           color: #e74c3c;
           font-size: 1.1rem;
-          margin-bottom: 0.5rem;
-          font-weight: 600;
+          margin-bottom: 0.8rem;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
         }
         
         p {
           color: #f8d7da;
           margin-bottom: 1.5rem;
           font-size: 0.9rem;
-          line-height: 1.4;
+          line-height: 1.6;
+          background: rgba(231, 76, 60, 0.1);
+          padding: 0.8rem;
+          border-radius: 6px;
         }
         
         .delete-account-form {
@@ -788,12 +839,30 @@ const Container = styled.div`
               border: none;
               border-radius: 6px;
               padding: 0.8rem 1.5rem;
-              font-weight: 500;
+              font-weight: 600;
               cursor: pointer;
               transition: var(--transition-normal);
+              position: relative;
+              overflow: hidden;
+              
+              &::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                transition: 0.6s;
+              }
               
               &:hover {
                 background: #c0392b;
+                box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+                
+                &::before {
+                  left: 100%;
+                }
               }
             }
             
@@ -809,6 +878,12 @@ const Container = styled.div`
               
               &:hover {
                 background: rgba(0, 0, 0, 0.3);
+                border-color: rgba(255, 255, 255, 0.2);
+                transform: translateY(-2px);
+              }
+              
+              &:active {
+                transform: translateY(0);
               }
             }
           }
@@ -845,19 +920,35 @@ const Container = styled.div`
         padding: 1rem;
         
         h3 {
-          font-size: 1rem;
+          font-size: 1.1rem;
         }
         
         p {
-          font-size: 0.85rem;
+          font-size: 0.9rem;
+          padding: 0.6rem;
+        }
+        
+        .form-group input {
+          padding: 0.7rem;
+          font-size: 1rem;
         }
         
         .form-buttons {
           flex-direction: column;
-          gap: 0.8rem;
+          gap: 1rem;
           
           button {
             width: 100%;
+            padding: 0.9rem;
+            font-size: 1rem;
+          }
+          
+          .confirm-delete-btn {
+            order: 2;
+          }
+          
+          .cancel-btn {
+            order: 1;
           }
         }
       }
