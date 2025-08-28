@@ -20,6 +20,8 @@ export default function ChatContainer({ currentChat: initialChat, socket }) {
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [showMessageActions, setShowMessageActions] = useState(false);
   const [showClearChatModal, setShowClearChatModal] = useState(false);
+  const [pendingMessages, setPendingMessages] = useState([]);
+  const [isConnected, setIsConnected] = useState(socket?.connected || false);
   
   // Update currentChat when initialChat changes
   useEffect(() => {
@@ -74,7 +76,17 @@ export default function ChatContainer({ currentChat: initialChat, socket }) {
   }, [socket, currentChat]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current) {
+      try {
+        messagesEndRef.current.scrollIntoView({ 
+          behavior: "smooth", 
+          block: "end" 
+        });
+      } catch (error) {
+        // Fallback for browsers that don't support smooth scrolling
+        messagesEndRef.current.scrollIntoView(false);
+      }
+    }
   };
   
   // Set up socket when chat changes
@@ -108,34 +120,63 @@ export default function ChatContainer({ currentChat: initialChat, socket }) {
         localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
       );
       
-      // Emit the message via socket
-      if (socket) {
-        socket.emit("send-msg", {
-          to: currentChat._id,
-          from: data._id,
-          msg,
-        });
+      // Generate message ID and timestamp
+      const messageId = uuidv4();
+      const timestamp = new Date().toISOString();
+      
+      // Create message object
+      const messageObj = {
+        to: currentChat._id,
+        from: data._id,
+        msg,
+        messageId,
+        timestamp
+      };
+      
+      // Check if socket is connected
+      if (socket && isConnected) {
+        // Emit the message via socket
+        socket.emit("send-msg", messageObj);
         
         // Stop typing indicator
         socket.emit("stop-typing", {
           to: currentChat._id,
           from: data._id,
         });
+      } else {
+        // Store message in pending queue
+        setPendingMessages(prev => [...prev, messageObj]);
+        
+        // Show notification
+        toast.info("Message will be sent when connection is restored", {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
       }
       
       // Save the message to the database
-      await axios.post(sendMessageRoute, {
-        from: data._id,
-        to: currentChat._id,
-        message: msg,
-      });
+      try {
+        await axios.post(sendMessageRoute, {
+          from: data._id,
+          to: currentChat._id,
+          message: msg,
+          messageId
+        });
+      } catch (error) {
+        console.error("Error saving message to database:", error);
+        // Show notification
+        toast.warning("Message saved locally. It may not persist if you close the app.", {
+          position: "bottom-right",
+        });
+      }
   
       // Update local message state
-      const timestamp = new Date().toISOString();
       const newMsg = { 
         fromSelf: true, 
         message: msg,
-        timestamp
+        timestamp,
+        messageId,
+        pending: !isConnected // Mark message as pending if not connected
       };
       
       setMessages(prevMessages => [...prevMessages, newMsg]);
@@ -144,6 +185,9 @@ export default function ChatContainer({ currentChat: initialChat, socket }) {
       setTimeout(() => scrollToBottom(), 100);
     } catch (error) {
       console.error("Error sending message:", error);
+      toast.error("Failed to send message", {
+        position: "bottom-right",
+      });
     }
   };
 
@@ -165,18 +209,88 @@ export default function ChatContainer({ currentChat: initialChat, socket }) {
     }
   };
 
+  // Track socket connection status and handle reconnection
+  useEffect(() => {
+    if (socket) {
+      const handleConnect = () => {
+        console.log("Socket connected");
+        setIsConnected(true);
+        
+        // Try to send any pending messages
+        if (pendingMessages.length > 0) {
+          pendingMessages.forEach(msg => {
+            socket.emit("send-msg", msg);
+          });
+          setPendingMessages([]);
+        }
+      };
+      
+      const handleDisconnect = () => {
+        console.log("Socket disconnected");
+        setIsConnected(false);
+        
+        // Show notification
+        toast.error("Connection lost. Trying to reconnect...", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      };
+      
+      const handleReconnect = (attemptNumber) => {
+        console.log(`Reconnection attempt #${attemptNumber}`);
+        toast.info(`Reconnecting... (Attempt ${attemptNumber})`, {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
+      };
+      
+      const handleReconnectSuccess = () => {
+        console.log("Reconnected successfully!");
+        toast.success("Reconnected successfully!", {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
+      };
+      
+      socket.on("connect", handleConnect);
+      socket.on("disconnect", handleDisconnect);
+      socket.on("reconnect_attempt", handleReconnect);
+      socket.on("reconnect", handleReconnectSuccess);
+      
+      // Set initial connection state
+      setIsConnected(socket.connected);
+      
+      return () => {
+        socket.off("connect", handleConnect);
+        socket.off("disconnect", handleDisconnect);
+        socket.off("reconnect_attempt", handleReconnect);
+        socket.off("reconnect", handleReconnectSuccess);
+      };
+    }
+  }, [socket, pendingMessages]);
+  
   // Listen for incoming messages and other socket events
   useEffect(() => {
     if (socket) {
       socket.on("msg-receive", (messageData) => {
         console.log("Message received:", messageData);
+        // Enhanced message object with more properties
         setArrivalMessage({ 
           fromSelf: false, 
           message: messageData.message,
           timestamp: messageData.timestamp || new Date().toISOString(),
-          sender: messageData.sender
+          sender: messageData.sender,
+          messageId: messageData.messageId || uuidv4() // Ensure messages have IDs
         });
         setIsTyping(false);
+        
+        // Force scroll to bottom on message arrival
+        setTimeout(() => scrollToBottom(), 100);
       });
       
       // Handle message deletion from other clients
@@ -215,10 +329,18 @@ export default function ChatContainer({ currentChat: initialChat, socket }) {
   // Update messages when a new one arrives
   useEffect(() => {
     if (arrivalMessage) {
-      setMessages(prev => [...prev, arrivalMessage]);
-      setTimeout(() => scrollToBottom(), 100);
+      // Check if the message isn't already in the array (prevent duplicates)
+      const messageExists = messages.some(
+        msg => msg.timestamp === arrivalMessage.timestamp && 
+              msg.message === arrivalMessage.message
+      );
+      
+      if (!messageExists) {
+        setMessages(prev => [...prev, arrivalMessage]);
+        setTimeout(() => scrollToBottom(), 100);
+      }
     }
-  }, [arrivalMessage]);
+  }, [arrivalMessage, messages]);
 
   // Delete a message
   const handleDeleteMessage = async (messageId) => {
@@ -327,11 +449,31 @@ export default function ChatContainer({ currentChat: initialChat, socket }) {
           </div>
           <div className="user-info">
             <h3>{currentChat.username}</h3>
-            <span className="status">{isTyping ? "typing..." : "online"}</span>
+            <span className="status">
+              {isTyping ? "typing..." : isConnected ? "online" : "disconnected"}
+              <span className={`connection-dot ${isConnected ? 'connected' : 'disconnected'}`}></span>
+            </span>
           </div>
         </div>
         
         <div className="chat-actions">
+          {!isConnected && (
+            <button 
+              className="action-btn reconnect-btn" 
+              aria-label="Reconnect"
+              onClick={() => {
+                if (socket) {
+                  toast.info("Attempting to reconnect...", {
+                    position: "bottom-right",
+                  });
+                  socket.connect();
+                }
+              }}
+              title="Reconnect"
+            >
+              <i className="fas fa-sync"></i>
+            </button>
+          )}
           <button className="action-btn" aria-label="Call">
             <i className="fas fa-phone"></i>
           </button>
@@ -387,6 +529,12 @@ export default function ChatContainer({ currentChat: initialChat, socket }) {
                   <p>{message.message}</p>
                   <span className="timestamp" aria-label="Sent at">
                     {formatTime(message.timestamp)}
+                    {message.pending && (
+                      <i 
+                        className="fas fa-clock message-pending" 
+                        title="Pending - Will be sent when connection is restored"
+                      ></i>
+                    )}
                     {message.fromSelf && (
                       <i 
                         className="fas fa-ellipsis-v message-options"
@@ -550,6 +698,25 @@ const Container = styled.div`
         .status {
           color: var(--text-tertiary);
           font-size: 0.8rem;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          
+          .connection-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+            
+            &.connected {
+              background-color: var(--success);
+            }
+            
+            &.disconnected {
+              background-color: var(--error);
+            }
+          }
           
           &:empty::before {
             content: "online";
@@ -581,10 +748,25 @@ const Container = styled.div`
         justify-content: center;
         transition: var(--transition-fast);
         
+        &.reconnect-btn {
+          background-color: rgba(255, 0, 0, 0.15);
+          color: var(--error);
+          animation: pulse 1.5s infinite;
+          
+          i {
+            animation: rotate 2s infinite linear;
+          }
+        }
+        
         &:hover, &:focus {
           background-color: rgba(255, 255, 255, 0.2);
           color: var(--text-primary);
           transform: scale(1.1);
+        }
+        
+        &.reconnect-btn:hover, &.reconnect-btn:focus {
+          background-color: rgba(255, 0, 0, 0.25);
+          color: var(--error);
         }
       }
     }
@@ -680,11 +862,30 @@ const Container = styled.div`
         }
         
         .timestamp {
-          display: block;
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          gap: 5px;
           font-size: 0.7rem;
           color: var(--text-tertiary);
           text-align: right;
           margin-top: 0.2rem;
+          
+          .message-pending {
+            color: var(--warning);
+            font-size: 0.8rem;
+            margin-left: 3px;
+            animation: pulse 1.5s infinite;
+          }
+          
+          .message-options {
+            cursor: pointer;
+            padding: 2px;
+            margin-left: 3px;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.2s ease;
+          }
         }
       }
     }
@@ -893,5 +1094,10 @@ const Container = styled.div`
     0% { box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.6); }
     70% { box-shadow: 0 0 0 10px rgba(var(--primary-rgb), 0); }
     100% { box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0); }
+  }
+  
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
 `;

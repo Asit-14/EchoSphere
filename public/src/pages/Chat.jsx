@@ -30,8 +30,37 @@ export default function Chat() {
   }, [navigate]);
   useEffect(() => {
     if (currentUser) {
-      socket.current = io(host);
+      // Initialize socket connection
+      socket.current = io(host, {
+        reconnection: true,
+        reconnectionAttempts: 10,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        timeout: 20000
+      });
+      
+      // Register user as online
       socket.current.emit("add-user", currentUser._id);
+      
+      // Handle reconnection
+      socket.current.on("connect", () => {
+        console.log("Socket reconnected");
+        if (currentUser?._id) {
+          socket.current.emit("add-user", currentUser._id);
+        }
+      });
+      
+      // Handle disconnection
+      socket.current.on("disconnect", (reason) => {
+        console.log("Socket disconnected:", reason);
+      });
+      
+      // Clean up socket connection on unmount
+      return () => {
+        if (socket.current) {
+          socket.current.disconnect();
+        }
+      };
     }
   }, [currentUser]);
 

@@ -96,8 +96,9 @@ io.on("connection", (socket) => {
       socket.to(sendUserSocket).emit("msg-receive", {
         fromSelf: false,
         message: data.msg,
-        timestamp: new Date().toISOString(),
-        sender: data.from
+        timestamp: data.timestamp || new Date().toISOString(),
+        sender: data.from,
+        messageId: data.messageId // Pass the message ID
       });
     }
   });

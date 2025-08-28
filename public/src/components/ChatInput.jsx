@@ -25,6 +25,14 @@ export default function ChatInput({ handleSendMsg }) {
     }
   };
 
+  const handleKeyDown = (e) => {
+    // Send message on Enter (but not with Shift+Enter)
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendChat(e);
+    }
+  };
+
   return (
     <Container>
       <div className="button-container">
@@ -36,11 +44,13 @@ export default function ChatInput({ handleSendMsg }) {
       <form className="input-container" onSubmit={(event) => sendChat(event)}>
         <input
           type="text"
-          placeholder="type your message here"
+          placeholder="Type your message here"
           onChange={(e) => setMsg(e.target.value)}
+          onKeyDown={handleKeyDown}
           value={msg}
+          autoFocus
         />
-        <button type="submit">
+        <button type="submit" disabled={msg.trim().length === 0}>
           <IoMdSend />
         </button>
       </form>
