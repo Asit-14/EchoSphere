@@ -37,6 +37,9 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Import passport config explicitly
+require('./config/passport'); // Ensure passport strategies are loaded
+
 mongoose
   .connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
@@ -55,6 +58,17 @@ app.get("/ping", (_req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
+
+// Handle client-side routing in production
+if (process.env.NODE_ENV === 'production') {
+  // Serve static files from the React app build directory
+  app.use(express.static(path.join(__dirname, '../public/build')));
+
+  // For any request that doesn't match an API route, send the React app
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/build/index.html'));
+  });
+}
 
 const server = app.listen(process.env.PORT, () =>
   console.log(`Server started on ${process.env.PORT}`)

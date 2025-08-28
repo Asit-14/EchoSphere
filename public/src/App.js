@@ -56,7 +56,8 @@ const Navigation = () => {
                 onClick={() => {
                   const userKey = process.env.REACT_APP_LOCALHOST_KEY || "echosphere-user";
                   localStorage.removeItem(userKey);
-                  window.location.href = "/login";
+                  // Use history.push instead of window.location.href to avoid 404 on refresh
+                  window.location.replace("/login");
                 }}
                 className="logout-button"
                 aria-label="Logout"
