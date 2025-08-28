@@ -7,7 +7,7 @@
     "dev": "concurrently \"npm run start --prefix backend\" \"npm run start --prefix frontend\"",
     "install:server": "cd server && npm install",
     "build": "npm install && npm run install:server",
-    "vercel-build": "cd public && npm install --legacy-peer-deps && REACT_APP_API_URL=https://echosphere-2fpq.onrender.com REACT_APP_LOCALHOST_KEY=echosphere-user npm run build"
+    "vercel-build": "cd public && npm install --legacy-peer-deps && CI=false REACT_APP_API_URL=https://echosphere-2fpq.onrender.com REACT_APP_LOCALHOST_KEY=echosphere-user npm run build"
   },
   "devDependencies": {
     "concurrently": "^9.1.0"
