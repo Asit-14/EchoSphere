@@ -146,15 +146,17 @@ export default function Login() {
 }
 
 const FormContainer = styled.div`
-  height: 100vh;
-  width: 100vw;
+  min-height: 100vh;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   background: linear-gradient(135deg, var(--background-dark) 0%, var(--background-medium) 100%);
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 1rem;
   
   /* Animated background effect */
   &::before {
@@ -216,14 +218,28 @@ const FormContainer = styled.div`
     box-shadow: var(--box-shadow);
     border: 1px solid rgba(255, 255, 255, 0.08);
     transition: transform 0.3s ease;
+    margin: 1rem;
     
     &:hover {
       transform: translateY(-5px);
     }
     
+    @media (max-width: 768px) {
+      max-width: 380px;
+      padding: 2.5rem;
+    }
+    
     @media (max-width: 480px) {
-      width: 90%;
-      padding: 2rem;
+      width: 95%;
+      max-width: 100%;
+      padding: 2rem 1.5rem;
+      margin: 0.5rem;
+      border-radius: 12px;
+      transform: none;
+      
+      &:hover {
+        transform: none;
+      }
     }
   }
   
@@ -249,6 +265,8 @@ const FormContainer = styled.div`
       width: 100%;
       font-size: 1rem;
       transition: all 0.3s ease;
+      -webkit-appearance: none; /* Fix iOS styling */
+      appearance: none;
       
       &::placeholder {
         color: rgba(255, 255, 255, 0.5);
@@ -259,6 +277,11 @@ const FormContainer = styled.div`
         box-shadow: 0 0 0 2px rgba(154, 134, 243, 0.2);
         outline: none;
       }
+      
+      @media screen and (max-width: 480px) {
+        padding: 0.9rem 0.9rem 0.9rem 2.5rem;
+        font-size: 0.95rem;
+      }
     }
   }
   
@@ -268,6 +291,14 @@ const FormContainer = styled.div`
     align-items: center;
     font-size: 0.85rem;
     margin: -0.5rem 0 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    
+    @media screen and (max-width: 480px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
     
     .remember-me {
       display: flex;
@@ -276,11 +307,16 @@ const FormContainer = styled.div`
       input[type="checkbox"] {
         margin-right: 6px;
         accent-color: var(--primary-color);
+        width: auto;
       }
       
       label {
         color: var(--text-tertiary);
         cursor: pointer;
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
       }
     }
     
@@ -326,19 +362,36 @@ const FormContainer = styled.div`
     display: flex;
     justify-content: center;
     gap: 1rem;
+    flex-wrap: wrap;
+    
+    @media screen and (max-width: 480px) {
+      gap: 0.8rem;
+    }
     
     .social-btn {
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.2rem;
       transition: all 0.3s;
+      border: none;
+      cursor: pointer;
       
       &:hover {
         transform: translateY(-3px);
+      }
+      
+      &:active {
+        transform: translateY(-1px);
+      }
+      
+      @media screen and (max-width: 480px) {
+        width: 42px;
+        height: 42px;
+        font-size: 1.1rem;
       }
       
       &.google {
@@ -362,6 +415,14 @@ const FormContainer = styled.div`
     border: none;
     font-weight: bold;
     cursor: pointer;
+    border-radius: 8px;
+    font-size: 1rem;
+    min-height: 48px;
+    
+    @media screen and (max-width: 480px) {
+      padding: 0.9rem 1.5rem;
+      width: 100%;
+    }
     border-radius: 8px;
     font-size: 1rem;
     text-transform: uppercase;

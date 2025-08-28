@@ -72,6 +72,8 @@ const Container = styled.div`
     right: 0;
     width: 100%;
     z-index: 100;
+    background-color: var(--background-dark);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
   
   .button-container {
@@ -146,6 +148,12 @@ const Container = styled.div`
     background-color: rgba(255, 255, 255, 0.05);
     padding: 0.2rem 0.3rem;
     transition: box-shadow 0.3s ease;
+    max-width: 100%;
+    
+    @media screen and (max-width: 480px) {
+      border-radius: 20px;
+      padding: 0.15rem 0.3rem;
+    }
     margin-bottom: 0;
     
     &:focus-within {

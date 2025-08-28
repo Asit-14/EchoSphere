@@ -47,12 +47,31 @@ body {
   overflow: hidden;
   color: var(--text-primary);
   background-color: var(--background-dark);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 /* Accessibility - Focus styles */
 *:focus-visible {
   outline: 2px solid var(--primary-color);
   outline-offset: 2px;
+}
+
+/* Responsive font sizes */
+html {
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
 }
 
 /* Scrollbar styling */
@@ -89,5 +108,16 @@ body {
 @media (max-width: 768px) {
   body {
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Prevent overflow on all elements */
+  * {
+    max-width: 100%;
   }
 }

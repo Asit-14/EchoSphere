@@ -98,6 +98,16 @@ const Container = styled.div`
   bottom: 0;
   overflow: hidden;
   
+  @media screen and (max-width: 768px) {
+    padding: 1rem;
+  }
+  
+  @media screen and (max-width: 480px) {
+    padding: 0.5rem;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
   /* Animated background effect */
   &::before {
     content: "";
