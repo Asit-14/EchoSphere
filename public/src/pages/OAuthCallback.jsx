@@ -1,0 +1,107 @@
+import React, { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
+import styled from "styled-components";
+import loader from "../assets/loader.gif";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { saveUserToStorage } from "../utils/helpers";
+import { verifyTokenRoute } from "../utils/APIRoutes";
+
+export default function OAuthCallback() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const toastOptions = {
+    position: "bottom-right",
+    autoClose: 8000,
+    pauseOnHover: true,
+    draggable: true,
+    theme: "dark",
+  };
+
+  useEffect(() => {
+    const verifyToken = async () => {
+      try {
+        // Get token from URL query params
+        const params = new URLSearchParams(location.search);
+        const token = params.get("token");
+        const error = params.get("error");
+
+        if (error) {
+          toast.error(`Authentication failed: ${error}`, toastOptions);
+          setTimeout(() => navigate("/login"), 3000);
+          return;
+        }
+
+        if (!token) {
+          toast.error("No authentication token received", toastOptions);
+          setTimeout(() => navigate("/login"), 3000);
+          return;
+        }
+
+        // Verify token with backend
+        const { data } = await axios.post(verifyTokenRoute, { token });
+
+        if (data.status === false) {
+          toast.error(data.msg || "Authentication failed", toastOptions);
+          setTimeout(() => navigate("/login"), 3000);
+          return;
+        }
+
+        // Login successful
+        saveUserToStorage(data.user);
+        navigate("/");
+      } catch (error) {
+        console.error("OAuth callback error:", error);
+        toast.error("Authentication failed. Please try again.", toastOptions);
+        setTimeout(() => navigate("/login"), 3000);
+      }
+    };
+
+    verifyToken();
+  }, [location, navigate]);
+
+  return (
+    <Container>
+      <div className="loading-container">
+        <img src={loader} alt="Loading" className="loader" />
+        <h2>Completing authentication...</h2>
+        <p>Please wait while we verify your credentials</p>
+      </div>
+      <ToastContainer />
+    </Container>
+  );
+}
+
+const Container = styled.div`
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, var(--background-dark) 0%, var(--background-medium) 100%);
+  
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    
+    .loader {
+      max-width: 50px;
+      margin-bottom: 1rem;
+    }
+    
+    h2 {
+      color: white;
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    p {
+      color: #ccc;
+      font-size: 1rem;
+    }
+  }
+`;

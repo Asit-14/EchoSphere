@@ -6,6 +6,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { loginRoute } from "../utils/APIRoutes";
 import { getUserFromStorage, saveUserToStorage } from "../utils/helpers";
+import SocialLogin from "../components/SocialLogin";
 // Import Font Awesome CSS
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
@@ -123,17 +124,7 @@ export default function Login() {
             <span>OR</span>
           </div>
           
-          <div className="social-login">
-            <button type="button" className="social-btn google">
-              <i className="fab fa-google"></i>
-            </button>
-            <button type="button" className="social-btn facebook">
-              <i className="fab fa-facebook-f"></i>
-            </button>
-            <button type="button" className="social-btn github">
-              <i className="fab fa-github"></i>
-            </button>
-          </div>
+          <SocialLogin />
           
           <span className="signup-link">
             Don't have an account? <Link to="/register">Create One</Link>

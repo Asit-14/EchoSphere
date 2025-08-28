@@ -5,6 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { registerRoute } from "../utils/APIRoutes";
+import SocialLogin from "../components/SocialLogin";
 // Import Font Awesome CSS
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
@@ -169,17 +170,7 @@ export default function Register() {
             <span>OR</span>
           </div>
           
-          <div className="social-login">
-            <button type="button" className="social-btn google">
-              <i className="fab fa-google"></i>
-            </button>
-            <button type="button" className="social-btn facebook">
-              <i className="fab fa-facebook-f"></i>
-            </button>
-            <button type="button" className="social-btn github">
-              <i className="fab fa-github"></i>
-            </button>
-          </div>
+          <SocialLogin />
           
           <span className="login-link">
             Already have an account? <Link to="/login">Log In</Link>
