@@ -34,10 +34,10 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "REACT_APP_API_URL=https://echosphere-2fpq.onrender.com react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "vercel-build": "npm run build"
+    "vercel-build": "REACT_APP_API_URL=https://echosphere-2fpq.onrender.com npm run build"
   },
   "eslintConfig": {
     "extends": [

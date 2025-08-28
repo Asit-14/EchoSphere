@@ -6,5 +6,9 @@
   "outputDirectory": "public/build",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  ],
+  "env": {
+    "REACT_APP_API_URL": "https://echosphere-2fpq.onrender.com",
+    "REACT_APP_LOCALHOST_KEY": "echosphere-user"
+  }
 }
