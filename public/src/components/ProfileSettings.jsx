@@ -5,7 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import loader from "../assets/loader.gif";
-import { updateUserRoute, changePasswordRoute } from "../utils/APIRoutes";
+import { updateUserRoute, changePasswordRoute, deleteAccountRoute } from "../utils/APIRoutes";
 import AvatarUpload from "./AvatarUpload";
 import { getAvatarUrl } from "../utils/helpers";
 
@@ -23,6 +23,8 @@ export default function ProfileSettings() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
   
   const toastOptions = {
     position: "bottom-right",
@@ -171,6 +173,42 @@ export default function ProfileSettings() {
   
   const handleChangeAvatar = () => {
     navigate("/setAvatar");
+  };
+  
+  const toggleDeleteConfirmation = () => {
+    setIsConfirmingDelete(!isConfirmingDelete);
+    setDeletePassword("");
+  };
+  
+  const handleDeleteAccount = async (e) => {
+    e.preventDefault();
+    
+    if (!deletePassword) {
+      toast.error("Please enter your password to confirm account deletion", toastOptions);
+      return;
+    }
+    
+    try {
+      setIsLoading(true);
+      const { data } = await axios.post(`${deleteAccountRoute}/${user._id}`, {
+        password: deletePassword,
+      });
+      
+      if (data.status === true) {
+        toast.success("Your account has been deleted", toastOptions);
+        localStorage.clear();
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      } else {
+        toast.error(data.msg || "Failed to delete account", toastOptions);
+      }
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      toast.error("An error occurred. Please try again.", toastOptions);
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   const refreshUser = (updatedUser) => {
@@ -345,12 +383,52 @@ export default function ProfileSettings() {
               
               <div className="danger-zone">
                 <h2>Danger Zone</h2>
-                <button className="logout-btn" onClick={() => {
-                  localStorage.clear();
-                  navigate("/login");
-                }}>
-                  Log Out
-                </button>
+                <div className="danger-actions">
+                  <button className="logout-btn" onClick={() => {
+                    localStorage.clear();
+                    navigate("/login");
+                  }}>
+                    Log Out
+                  </button>
+                  
+                  <button type="button" className="delete-btn" onClick={toggleDeleteConfirmation}>
+                    Delete Account
+                  </button>
+                </div>
+                
+                {isConfirmingDelete && (
+                  <div className="delete-account-confirmation">
+                    <h3>Are you sure you want to delete your account?</h3>
+                    <p>This action cannot be undone. All your data will be permanently removed.</p>
+                    
+                    <form onSubmit={handleDeleteAccount} className="delete-account-form">
+                      <div className="form-group">
+                        <label htmlFor="deletePassword">Enter your password to confirm</label>
+                        <input
+                          type="password"
+                          id="deletePassword"
+                          value={deletePassword}
+                          onChange={(e) => setDeletePassword(e.target.value)}
+                          placeholder="Enter your password"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="form-buttons">
+                        <button type="submit" className="confirm-delete-btn">
+                          Delete My Account
+                        </button>
+                        <button
+                          type="button"
+                          className="cancel-btn"
+                          onClick={toggleDeleteConfirmation}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -618,8 +696,14 @@ const Container = styled.div`
         font-weight: 600;
         margin-bottom: 1rem;
       }
+
+      .danger-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
       
-      .logout-btn {
+      .logout-btn, .delete-btn {
         background: rgba(231, 76, 60, 0.1);
         color: #e74c3c;
         border: 1px solid rgba(231, 76, 60, 0.5);
@@ -631,6 +715,103 @@ const Container = styled.div`
         
         &:hover {
           background: rgba(231, 76, 60, 0.2);
+        }
+      }
+
+      .delete-btn {
+        background: rgba(231, 76, 60, 0.15);
+        color: #e74c3c;
+        border: 1px solid rgba(231, 76, 60, 0.6);
+
+        &:hover {
+          background: rgba(231, 76, 60, 0.25);
+        }
+      }
+      
+      .delete-account-confirmation {
+        margin-top: 1.5rem;
+        padding: 1.5rem;
+        background: rgba(231, 76, 60, 0.05);
+        border: 1px solid rgba(231, 76, 60, 0.3);
+        border-radius: 8px;
+        
+        h3 {
+          color: #e74c3c;
+          font-size: 1.1rem;
+          margin-bottom: 0.5rem;
+          font-weight: 600;
+        }
+        
+        p {
+          color: #f8d7da;
+          margin-bottom: 1.5rem;
+          font-size: 0.9rem;
+          line-height: 1.4;
+        }
+        
+        .delete-account-form {
+          .form-group {
+            margin-bottom: 1.2rem;
+            
+            label {
+              display: block;
+              margin-bottom: 0.5rem;
+              font-size: 0.9rem;
+              color: #e6e6e6;
+            }
+            
+            input {
+              width: 100%;
+              padding: 0.8rem;
+              border-radius: 6px;
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              background: rgba(0, 0, 0, 0.2);
+              color: #e6e6e6;
+              transition: var(--transition-normal);
+              
+              &:focus {
+                border-color: rgba(231, 76, 60, 0.5);
+                outline: none;
+                box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
+              }
+            }
+          }
+          
+          .form-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            
+            .confirm-delete-btn {
+              background: #e74c3c;
+              color: white;
+              border: none;
+              border-radius: 6px;
+              padding: 0.8rem 1.5rem;
+              font-weight: 500;
+              cursor: pointer;
+              transition: var(--transition-normal);
+              
+              &:hover {
+                background: #c0392b;
+              }
+            }
+            
+            .cancel-btn {
+              background: rgba(0, 0, 0, 0.2);
+              color: #e6e6e6;
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              border-radius: 6px;
+              padding: 0.8rem 1.5rem;
+              font-weight: 500;
+              cursor: pointer;
+              transition: var(--transition-normal);
+              
+              &:hover {
+                background: rgba(0, 0, 0, 0.3);
+              }
+            }
+          }
         }
       }
     }
@@ -648,6 +829,38 @@ const Container = styled.div`
     .avatar-section .avatar-container {
       width: 120px;
       height: 120px;
+    }
+    
+    .danger-zone {
+      .danger-actions {
+        flex-direction: column;
+        gap: 0.8rem;
+        
+        button {
+          width: 100%;
+        }
+      }
+      
+      .delete-account-confirmation {
+        padding: 1rem;
+        
+        h3 {
+          font-size: 1rem;
+        }
+        
+        p {
+          font-size: 0.85rem;
+        }
+        
+        .form-buttons {
+          flex-direction: column;
+          gap: 0.8rem;
+          
+          button {
+            width: 100%;
+          }
+        }
+      }
     }
   }
 `;
