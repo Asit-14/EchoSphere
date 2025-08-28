@@ -6,6 +6,7 @@ const {
   logOut,
   updateUser,
   changePassword,
+  deleteAccount,
 } = require("../controllers/userController");
 
 const { uploadAvatar } = require("../controllers/userControllerExtensions");
@@ -19,6 +20,7 @@ router.post("/setavatar/:id", setAvatar);
 router.get("/logout/:id", logOut);
 router.post("/updateuser/:id", updateUser);
 router.post("/changepassword/:id", changePassword);
+router.post("/deleteaccount/:id", deleteAccount);
 router.post("/uploadavatar/:id", upload.single("avatar"), uploadAvatar);
 
 module.exports = router;
